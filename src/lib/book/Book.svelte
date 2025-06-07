@@ -1,14 +1,24 @@
 <script lang="ts">
 	import type { Book } from '$lib/types/types';
 
-	export let book: Book;
-	export let edit = false;
-	export let showEditIcon = false;
-	export let height = 200;
-	export let className = '';
+	interface Props {
+		book: Book;
+		edit?: boolean;
+		showEditIcon?: boolean;
+		height?: number;
+		className?: string;
+	}
 
-	$: percentage = book.percentage ? book.percentage : -1;
-	$: href = `/${edit ? 'edit' : 'read'}/${book.id}`;
+	let {
+		book,
+		edit = false,
+		showEditIcon = false,
+		height = 200,
+		className = ''
+	}: Props = $props();
+
+	let percentage = $derived(book.percentage ? book.percentage : -1);
+	let href = $derived(`/${edit ? 'edit' : 'read'}/${book.id}`);
 </script>
 
 <div class={`relative ${className}`}>

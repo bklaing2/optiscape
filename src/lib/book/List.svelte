@@ -2,12 +2,23 @@
 	import type { Book } from '$lib/types/types';
 	import BookView from '$lib/book/Book.svelte';
 
-	export let books: Book[];
-	export let edit = false;
-	export let showEditIcon = false;
-	export let height: number = 200;
-	export let vertical = false;
-	export let className = '';
+	interface Props {
+		books: Book[];
+		edit?: boolean;
+		showEditIcon?: boolean;
+		height?: number;
+		vertical?: boolean;
+		className?: string;
+	}
+
+	let {
+		books,
+		edit = false,
+		showEditIcon = false,
+		height = 200,
+		vertical = false,
+		className = ''
+	}: Props = $props();
 </script>
 
 <div

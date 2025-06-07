@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import type { PageData } from './$types';
 	import type { Keyframe, PageTurned, Selection } from '$lib/types/types';
 	import { updateEditHistory } from '$lib/util/storage';
@@ -11,25 +11,31 @@
 	import Timeline from '$lib/keyframe/Timeline.svelte';
 	import type { NavItem } from 'epubjs';
 
-	export let data: PageData;
-	$: ({ metadata, epub, keyframes, location } = data);
+	interface Props {
+		data: PageData;
+	}
+
+	let { data = $bindable() }: Props = $props();
+	let { metadata, epub, keyframes, location } = $derived(data);
 
 	let reader: Reader;
 
 	let selecting = false;
-	let selectionBounds = {} as {
-		down?: { x: number; y: number };
-		up?: { x: number; y: number };
-	};
+	let selectionBounds = $state(
+		{} as {
+			down?: { x: number; y: number };
+			up?: { x: number; y: number };
+		}
+	);
 
-	let showTooltip = false;
+	let showTooltip = $state(false);
 
-	let showKeyframeEditor = false;
-	let keyframe: Partial<Keyframe & { start_snippet: string; end_snippet: string }> = {};
+	let showKeyframeEditor = $state(false);
+	let keyframe: Partial<Keyframe & { start_snippet: string; end_snippet: string }> = $state({});
 
 	function OnPageTurn({ start }: PageTurned) {
-		$page.url.searchParams.set('location', start);
-		updateEditHistory($page.params.id, start);
+		page.url.searchParams.set('location', start);
+		updateEditHistory(page.params.id, start);
 	}
 
 	function OnChapterClicked(chapter: NavItem) {
@@ -166,10 +172,10 @@
 </svelte:head>
 
 <svelte:window
-	on:beforeunload={epub.destroy}
-	on:mousemove={(e) => OnSelectionMove(e.screenX, e.screenY)}
-	on:mousedown={undefined}
-	on:mouseup={(e) => OnSelectionEnd(e.screenX, e.screenY)}
+	onbeforeunload={epub.destroy}
+	onmousemove={(e) => OnSelectionMove(e.screenX, e.screenY)}
+	onmousedown={undefined}
+	onmouseup={(e) => OnSelectionEnd(e.screenX, e.screenY)}
 />
 
 <Reader

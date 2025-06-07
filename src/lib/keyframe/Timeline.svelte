@@ -4,10 +4,14 @@
 	import TimelineSection from './TimelineSection.svelte';
 	import cfi from '$lib/util/cfi';
 
-	export let keyframes: (Keyframe & { start_snippet: string; end_snippet?: string })[];
-	export let book: Book;
+	interface Props {
+		keyframes: (Keyframe & { start_snippet: string; end_snippet?: string })[];
+		book: Book;
+	}
 
-	$: SectionKeyframes = async () => {
+	let { keyframes, book }: Props = $props();
+
+	let SectionKeyframes = $derived(async () => {
 		const percentages = await Promise.all(
 			book.navigation.toc.map(async (c) =>
 				book.locations.percentageFromCfi(await cfi.fromHref(c.href, book))
@@ -27,7 +31,7 @@
 			},
 			percentages.map((_) => [] as typeof keyframes)
 		);
-	};
+	});
 </script>
 
 {#await SectionKeyframes() then sectionedKeyframes}

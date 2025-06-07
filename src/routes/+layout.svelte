@@ -1,8 +1,11 @@
-<script>
-	import Header from './Header.svelte';
+<script lang="ts">
+	import type { LayoutProps } from './$types';
 	import '../app.css';
 	import './styles.css';
+	import Header from './Header.svelte';
 	import Footer from './Footer.svelte';
+
+	let { children }: LayoutProps = $props();
 </script>
 
 <div
@@ -10,8 +13,7 @@
 >
 	<Header />
 
-	<main class="w-full flex flex-col px-4 box-border"><slot /></main>
+	<main class="w-full flex flex-col px-4 box-border">{@render children?.()}</main>
 
 	<Footer signedIn={false} />
 </div>
-

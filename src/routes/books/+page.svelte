@@ -1,13 +1,17 @@
 <script lang="ts">
 	import type { PageData } from './$types';
+	import { page } from '$app/state';
 	import BookList from '$lib/book/List.svelte';
-	import { page } from '$app/stores';
 
-	export let data: PageData;
-	$: ({ streamed } = data);
-	$: searchParams = $page.url.searchParams;
-	$: showEditIcon = searchParams.has('edit');
-	$: query = searchParams.get('query');
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
+	let { streamed } = $derived(data);
+	let searchParams = $derived(page.url.searchParams);
+	let showEditIcon = $derived(searchParams.has('edit'));
+	let query = $derived(searchParams.get('query'));
 </script>
 
 <form action="/books" class="contents">

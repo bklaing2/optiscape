@@ -1,18 +1,8 @@
-import { error, fail } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import type { Keyframe } from '$lib/types/types';
 
-export const load: PageServerLoad = async ({ locals, params }) => {
-  // const { supabase } = locals
-
-  // const response = await supabase
-  // 	.from('keyframes')
-  // 	.select('*')
-  // 	.eq('book_id', params.id)
-
-  // if (response.error) error(500, response.error.message)
-
-  // return { keyframes: response.data }
+export const load: PageServerLoad = async () => {
   return { keyframes: [] as Keyframe[] };
 };
 

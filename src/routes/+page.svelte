@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 
 	import BookView from '$lib/book/Book.svelte';
 	import BookList from '$lib/book/List.svelte';
 	import SeeAll from '$lib/buttons/SeeAll.svelte';
 
-	export let data: PageData;
-	$: ({ currentlyReading, history = [], streamed } = data);
+	let { data }: PageProps = $props();
+	let { currentlyReading, history = [], streamed } = $derived(data);
 </script>
 
 <svelte:head>

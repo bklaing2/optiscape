@@ -1,6 +1,11 @@
 <script lang="ts">
 	import GithubLogo from 'virtual:icons/logos/github-icon';
-	export let signedIn: boolean;
+
+	interface Props {
+		signedIn: boolean;
+	}
+
+	let { signedIn }: Props = $props();
 </script>
 
 <footer class="flex flex-col justify-center items-center gap-x-8 gap-y-4 p-8">
@@ -26,7 +31,7 @@
 			<li>
 				<button class="sign-out" type="submit">sign out</button>
 			</li>
-			<li />{/if}
+			<li></li>{/if}
 	</ul>
 
 	<ul class="contents">

@@ -9,8 +9,12 @@
 	import { enhance } from '$app/forms';
 	import type { ActionResult } from '@sveltejs/kit';
 
-	export let show = false;
-	export let keyframe: Partial<Keyframe & { start_snippet: string; end_snippet: string }>;
+	interface Props {
+		show?: boolean;
+		keyframe: Partial<Keyframe & { start_snippet: string; end_snippet: string }>;
+	}
+
+	let { show = $bindable(false), keyframe = $bindable() }: Props = $props();
 
 	const dispatch = createEventDispatcher<{
 		discarded: undefined;
@@ -18,21 +22,21 @@
 		keyframeAdded: Keyframe;
 	}>();
 
-	let searchInput: HTMLInputElement;
+	let searchInput: HTMLInputElement = $state();
 
-	$: canAdd =
-		!!keyframe.source &&
-		((keyframe.category === 'sfx' && !!keyframe.start) || (!!keyframe.start && !!keyframe.end));
-	$: addButtonText = !keyframe.category
+	let canAdd =
+		$derived(!!keyframe.source &&
+		((keyframe.category === 'sfx' && !!keyframe.start) || (!!keyframe.start && !!keyframe.end)));
+	let addButtonText = $derived(!keyframe.category
 		? 'Choose audio type'
 		: !keyframe.source
 		? 'Choose/Upload audio'
 		: keyframe.category !== 'sfx' && !keyframe.end
 		? 'Select end range'
-		: 'Add';
+		: 'Add');
 
 	const debounce = new Debounce();
-	let searchResults: SearchResults = { sounds: [], count: 0 };
+	let searchResults: SearchResults = $state({ sounds: [], count: 0 });
 
 	function OnSearch(e: any) {
 		debounce.buffer(async () => (searchResults = await Search(e.target?.value)));
@@ -55,9 +59,11 @@
 
 <form action="?/create" method="POST" use:enhance={OnSubmit}>
 	<Modal bind:show>
-		<h2 slot="header" class="text-white text-center text-2xl col-span-full drop-shadow">
-			Add {keyframe.category}
-		</h2>
+		{#snippet header()}
+				<h2  class="text-white text-center text-2xl col-span-full drop-shadow">
+				Add {keyframe.category}
+			</h2>
+			{/snippet}
 
 		<div class="grid grid-rows-[1fr_min-content] col-span-full">
 			<!-- Category Selector
@@ -82,7 +88,7 @@
 				type="text"
 				bind:this={searchInput}
 				placeholder="Search for sound..."
-				on:keyup={OnSearch}
+				onkeyup={OnSearch}
 				class="bg-orange-200/30 h-min mb-6 px-8 py-4 rounded-full outline-none placeholder:text-slate-600"
 			/>
 
@@ -125,10 +131,12 @@
 			<input name="percentageEnd" value={keyframe.end_percentage} type="hidden" />
 		</div>
 
-		<button slot="left button" class="py-4 text-rose-700" on:click={Reset} type="button"
+		<!-- @migration-task: migrate this slot by hand, `left button` is an invalid identifier -->
+	<button slot="left button" class="py-4 text-rose-700" onclick={Reset} type="button"
 			>Discard</button
 		>
-		<button slot="right button" class="py-4 disabled:text-slate-600" disabled={!canAdd}
+		<!-- @migration-task: migrate this slot by hand, `right button` is an invalid identifier -->
+	<button slot="right button" class="py-4 disabled:text-slate-600" disabled={!canAdd}
 			>{addButtonText}</button
 		>
 	</Modal>

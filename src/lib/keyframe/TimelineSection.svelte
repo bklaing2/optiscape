@@ -5,9 +5,13 @@
 	import { enhance } from '$app/forms';
 	import Audio from '$lib/buttons/Audio.svelte';
 
-	export let chapter: NavItem;
-	export let keyframes: (Keyframe & { start_snippet: string; end_snippet?: string })[];
-	let expanded = false;
+	interface Props {
+		chapter: NavItem;
+		keyframes: (Keyframe & { start_snippet: string; end_snippet?: string })[];
+	}
+
+	let { chapter, keyframes }: Props = $props();
+	let expanded = $state(false);
 
 	const dispatch = createEventDispatcher<{
 		chapterClicked: NavItem;
@@ -24,12 +28,12 @@
 
 <div class="w-full flex flex-row col-span-full">
 	<button
-		on:click={() => (expanded = !expanded)}
+		onclick={() => (expanded = !expanded)}
 		class="w-8 h-8 p-1 aspect-square rounded-full hover:bg-orange-200/50"
 		>{expanded ? '▽' : '▷'}</button
 	>
 	<button
-		on:click={() => dispatch('chapterClicked', chapter)}
+		onclick={() => dispatch('chapterClicked', chapter)}
 		class="grow text-left py-1 px-4 rounded-full hover:bg-orange-200/50"
 	>
 		{chapter.label}
@@ -44,13 +48,13 @@
 		<Audio src={kf.source} />
 		<button
 			class="truncate max-w-full"
-			on:click={() => dispatch('keyframeClicked', { keyframe: kf, marker: 'start' })}
+			onclick={() => dispatch('keyframeClicked', { keyframe: kf, marker: 'start' })}
 		>
 			{kf.start_snippet}
 		</button>
 		<button
 			class="truncate max-w-full"
-			on:click={() => dispatch('keyframeClicked', { keyframe: kf, marker: 'end' })}
+			onclick={() => dispatch('keyframeClicked', { keyframe: kf, marker: 'end' })}
 			dir="rtl"
 		>
 			{kf.end_snippet || ''}

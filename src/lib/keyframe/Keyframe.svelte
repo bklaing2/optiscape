@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	export type Keyframe = {
 		id: number
 		category: 'music' | 'ambience' | 'sfx'
@@ -17,18 +17,22 @@
 
 	const dispatch = createEventDispatcher()
 
-  export let keyframe: Keyframe
+	interface Props {
+		keyframe: Keyframe;
+	}
+
+	let { keyframe }: Props = $props();
 </script>
 
 
 <div class="container">
-	<button class="snippet" on:click={() => dispatch('click', keyframe)}>
+	<button class="snippet" onclick={() => dispatch('click', keyframe)}>
 		{keyframe.snippetStart}
 	</button>
 
 	<div class="buttons">
-		<button on:click={() => dispatch('edit', keyframe)}>edit</button>
-		<button on:click={() => dispatch('delete', keyframe)}>X</button>
+		<button onclick={() => dispatch('edit', keyframe)}>edit</button>
+		<button onclick={() => dispatch('delete', keyframe)}>X</button>
 	</div>
 </div>
 

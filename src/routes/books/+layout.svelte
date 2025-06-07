@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import type { LayoutProps } from './$types';
+	import { page } from '$app/state';
 	import NavLink from '$lib/buttons/NavLink.svelte';
-	import type { LayoutData } from './$types';
 
-	export let data: LayoutData;
-	$: ({ streamed } = data);
-	$: searchParams = $page.url.searchParams;
-	$: category = searchParams.get('category');
-	$: entry = searchParams.get('entry');
-	$: filter = searchParams.get('filter');
+	let { data, children }: LayoutProps = $props();
+	let { streamed } = $derived(data);
+	let searchParams = $derived(page.url.searchParams);
+	let category = $derived(searchParams.get('category'));
+	let entry = $derived(searchParams.get('entry'));
+	let filter = $derived(searchParams.get('filter'));
 </script>
 
 <div
@@ -54,5 +54,5 @@
 		</ul>
 	{/await}
 
-	<div class="flex flex-col gap-y-4 items-center w-full"><slot /></div>
+	<div class="flex flex-col gap-y-4 items-center w-full">{@render children?.()}</div>
 </div>

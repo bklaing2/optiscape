@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import type { PageData } from './$types';
 	import type { Keyframe, PageTurned } from '$lib/types/types';
 	import sounds from '$lib/util/sounds';
@@ -7,8 +7,12 @@
 	import { updateHistory, updateReadingRate } from '$lib/util/storage.js';
 	import Reader from '$lib/book/Reader.svelte';
 
-	export let data: PageData;
-	$: ({ location, metadata, epub, readingRate } = data);
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
+	let { location, metadata, epub, readingRate } = $derived(data);
 
 	let characterCount: number;
 	let startTime = Number.NEGATIVE_INFINITY;
@@ -20,7 +24,7 @@
 	function onPageTurn({ start, end }: PageTurned) {
 		console.log('Page turned', start, end);
 		location = start;
-		$page.url.searchParams.set('location', start);
+		page.url.searchParams.set('location', start);
 		updateHistory(metadata, start, epub.locations.percentageFromCfi(end));
 
 		// Update reading rate
@@ -48,7 +52,7 @@
 		const startPercentage = epub.locations.percentageFromCfi(start);
 		const endPercentage = epub.locations.percentageFromCfi(end);
 		const response = await fetch(
-			`/api/optiscapes/${$page.params.id}/script?start=${startPercentage}&end=${endPercentage}`
+			`/api/optiscapes/${page.params.id}/script?start=${startPercentage}&end=${endPercentage}`
 		);
 		const script = (await response.json()) as Keyframe[];
 
@@ -128,6 +132,6 @@
 	<meta name="description" content="About this app" />
 </svelte:head>
 
-<svelte:window on:beforeunload={epub.destroy} />
+<svelte:window onbeforeunload={epub.destroy} />
 
 <Reader {epub} {location} on:pageTurned={(e) => onPageTurn(e.detail)} />

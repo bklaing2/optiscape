@@ -1,10 +1,15 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 
-	export let href: string;
-	export let hidden = false;
-	export let active: boolean | undefined = undefined;
-	$: isActive = active !== undefined ? active : $page.url.pathname === href;
+	interface Props {
+		href: string;
+		hidden?: boolean;
+		active?: boolean | undefined;
+		children?: import('svelte').Snippet;
+	}
+
+	let { href, hidden = false, active = undefined, children }: Props = $props();
+	let isActive = $derived(active !== undefined ? active : page.url.pathname === href);
 </script>
 
 <li aria-current={active ? 'page' : undefined}>
@@ -15,6 +20,6 @@
 			? 'bg-orange-200/30  border-amber-900/20'
 			: 'border-transparent'} {hidden && 'hidden'}"
 	>
-		<slot />
+		{@render children?.()}
 	</a>
 </li>

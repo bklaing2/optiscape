@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
 	export type CfiLocation = { start: string; end: string };
 </script>
 
@@ -10,13 +10,17 @@
 	import type { Relocated, Selected } from '$lib/types/types';
 	import sounds from '$lib/util/sounds';
 
-	export let epub: Book;
-	export let location: string | undefined = undefined;
-	export let showPlayButton = false;
+	interface Props {
+		epub: Book;
+		location?: string | undefined;
+		showPlayButton?: boolean;
+	}
+
+	let { epub, location = undefined, showPlayButton = false }: Props = $props();
 
 	let rendition: Rendition;
-	let atStart = false,
-		atEnd = false;
+	let atStart = $state(false),
+		atEnd = $state(false);
 
 	let highlights = [] as Selected[];
 
@@ -141,20 +145,20 @@
 </script>
 
 <svelte:window
-	on:keydown={keyboardNav}
-	on:readermousemove={(e) => dispatch('mousemove', { x: e.detail.x, y: e.detail.y })}
-	on:readermousedown={(e) => dispatch('mousedown', { x: e.detail.x, y: e.detail.y })}
-	on:readermouseup={(e) => dispatch('mouseup', { x: e.detail.x, y: e.detail.y })}
-	on:resize={undefined}
+	onkeydown={keyboardNav}
+	onreadermousemove={(e) => dispatch('mousemove', { x: e.detail.x, y: e.detail.y })}
+	onreadermousedown={(e) => dispatch('mousedown', { x: e.detail.x, y: e.detail.y })}
+	onreadermouseup={(e) => dispatch('mouseup', { x: e.detail.x, y: e.detail.y })}
+	onresize={undefined}
 />
 
 <div class="max-w-full h-full">
-	<div id="rendition" class="max-width-full h-96" />
+	<div id="rendition" class="max-width-full h-96"></div>
 
 	<div class="flex drop-shadow-lg">
 		<ReaderNav on:click={() => rendition.prev()} side="left" hidden={atStart} />
 		<button
-			on:click={() => sounds.toggle()}
+			onclick={() => sounds.toggle()}
 			class="py-1 px-2 bg-orange-200/30 border border-amber-800/10 hover:bg-orange-300/20 select-none"
 			style:display={showPlayButton ? undefined : 'none'}>{'⏵/⏸'}</button
 		>

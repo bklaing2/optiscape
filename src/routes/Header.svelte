@@ -1,8 +1,8 @@
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import NavLink from '$lib/buttons/NavLink.svelte';
 
-	$: reading = $page.url.pathname.includes('/read/');
+	let reading = $derived(page.url.pathname.includes('/read/'));
 </script>
 
 <header class="flex flex-wrap justify-center items-center gap-8 my-6 mx-auto">
@@ -17,7 +17,7 @@
 			<NavLink href="/books">Books</NavLink>
 			<NavLink href="/edit">Edit</NavLink>
 			<NavLink href="/about">About</NavLink>
-			<NavLink href="/edit/{$page.params.id}" hidden={!reading}>Edit this book!</NavLink>
+			<NavLink href="/edit/{page.params.id}" hidden={!reading}>Edit this book!</NavLink>
 		</ul>
 	</nav>
 </header>

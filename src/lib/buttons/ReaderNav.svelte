@@ -1,6 +1,13 @@
 <script lang="ts">
-  export let side: 'left' | 'right'
-  export let hidden = false
+  import { createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
+  interface Props {
+    side: 'left' | 'right';
+    hidden?: boolean;
+  }
+
+  let { side, hidden = false }: Props = $props();
 </script>
 
 
@@ -19,7 +26,7 @@
     select-none
     touch-manipulation
   `}
-  on:click
+  onclick={bubble('click')}
 >
   {side === 'left' ? '‹' : '›'}
 </button>
