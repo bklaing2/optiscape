@@ -6,7 +6,7 @@ declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      fetchBooks: (url: string) => Promise<Response>;
+      fetchBooks: (feed?: string) => Promise<Response>;
     }
     // interface PageData {}
     // interface Platform {}

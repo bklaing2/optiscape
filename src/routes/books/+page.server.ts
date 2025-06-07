@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
       entry = ''
     }
 
-    const response = await fetchBooks(`https://standardebooks.org/feeds/opds/${category}/${entry}${query ? '?query=' + query : ''}`)
+    const response = await fetchBooks(`${category}/${entry}${query ? '?query=' + query : ''}`)
     if (response.status !== 200) error(response.status, response.statusText)
 
     const xmlDom = new xmldom.DOMParser().parseFromString(await response.text())

@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 
   async function GetBooks() {
-    const response = await fetchBooks(`https://standardebooks.org/feeds/opds/all`)
+    const response = await fetchBooks('all')
     if (response.status !== 200) error(response.status, response.statusText)
 
     const xmlDom = new xmldom.DOMParser().parseFromString(await response.text())

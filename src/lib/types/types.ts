@@ -12,14 +12,14 @@ export interface Book {
 }
 
 export interface Keyframe {
-  id: number;
-  book_id: string;
-  category: "sfx" | "ambience" | "music";
-  source: string;
-  start: string;
-  end: string | null;
-  end_percentage: number;
-  start_percentage: number;
+  id: number
+  book_id: string
+  category: "sfx" | "ambience" | "music"
+  source: string
+  start: string
+  end: string | null
+  end_percentage: number
+  start_percentage: number
 }
 
 
