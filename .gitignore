@@ -16,3 +16,6 @@ vite.config.ts.timestamp-*
 /static/music
 /static/ambience
 /static/sfx
+
+# sst
+.sst

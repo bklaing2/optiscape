@@ -1,0 +1,36 @@
+name: optiscape
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bun build/index.js
+    ports:
+      - 8080:3000
+    profiles:
+      - prod
+
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bun --bun run dev
+    volumes:
+      - .:/app
+    ports:
+      - 5173:5173
+    profiles:
+      - dev
+
+  frontend-preview:
+    build:
+      context: .
+      dockerfile: Dockerfile.preview
+    command: bun --bun run preview
+    volumes:
+      - .:/app
+    ports:
+      - 5173:4173
+    profiles:
+      - preview
