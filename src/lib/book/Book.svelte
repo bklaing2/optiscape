@@ -37,7 +37,7 @@
 	<a
 		href="/edit/{book.id}"
 		style:display={showEditIcon ? undefined : 'none'}
-		class="absolute -bottom-2 -right-2 bg-white/30 rounded-full z-10 w-8 h-8 text-center align-middle flex items-center justify-center backdrop-blur-sm border border-amber-900/20 hover:backdrop-blur-3xl transition-all"
+		class="absolute -bottom-2 -right-2 bg-white/30 rounded-full z-10 w-8 h-8 text-center align-middle flex items-center justify-center backdrop-blur-xs border border-amber-900/20 hover:backdrop-blur-3xl transition-all"
 		>✏️</a
 	>
 

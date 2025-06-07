@@ -12,7 +12,7 @@
 </script>
 
 <div
-	class="grid grid-rows-[repeat(2,_min-content)_1fr] grid-cols-[max-content_1fr] items-start justify-items-center h-full w-full gap-x-4 gap-y-14"
+	class="grid grid-rows-[repeat(2,min-content)_1fr] grid-cols-[max-content_1fr] items-start justify-items-center h-full w-full gap-x-4 gap-y-14"
 >
 	<h1 class="col-span-full">Optiscape books</h1>
 
@@ -41,7 +41,7 @@
 						name="filter"
 						placeholder="Filter"
 						value={filter}
-						class="bg-orange-200/60 border border-amber-900/0 h-min mb-6 px-8 py-4 rounded-full outline-none placeholder:text-slate-600 focus:border-amber-900/20 transition"
+						class="bg-orange-200/60 border border-amber-900/0 h-min mb-6 px-8 py-4 rounded-full outline-hidden placeholder:text-slate-600 focus:border-amber-900/20 transition"
 					/>
 				</form>
 

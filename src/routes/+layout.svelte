@@ -9,7 +9,7 @@
 </script>
 
 <div
-	class="grid grid-rows-[min-content_minmax(min-content,_1fr)_min-content] grid-cols-1 gap-8 pb-16 h-full max-w-4xl mx-auto"
+	class="grid grid-rows-[min-content_minmax(min-content,1fr)_min-content] grid-cols-1 gap-8 pb-16 h-full max-w-4xl mx-auto"
 >
 	<Header />
 

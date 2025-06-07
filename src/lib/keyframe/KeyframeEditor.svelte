@@ -60,7 +60,7 @@
 <form action="?/create" method="POST" use:enhance={OnSubmit}>
 	<Modal bind:show>
 		{#snippet header()}
-				<h2  class="text-white text-center text-2xl col-span-full drop-shadow">
+				<h2  class="text-white text-center text-2xl col-span-full drop-shadow-sm">
 				Add {keyframe.category}
 			</h2>
 			{/snippet}
@@ -89,7 +89,7 @@
 				bind:this={searchInput}
 				placeholder="Search for sound..."
 				onkeyup={OnSearch}
-				class="bg-orange-200/30 h-min mb-6 px-8 py-4 rounded-full outline-none placeholder:text-slate-600"
+				class="bg-orange-200/30 h-min mb-6 px-8 py-4 rounded-full outline-hidden placeholder:text-slate-600"
 			/>
 
 			<div class="flex flex-col">

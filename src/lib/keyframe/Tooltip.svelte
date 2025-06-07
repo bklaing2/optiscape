@@ -31,7 +31,7 @@
 
 
 {#if show}
-  <div class="py-4 px-8 absolute bg-slate-700 rounded-2xl text-white text-center flex flex-col gap-2 shadow-md translate-x-[-50%] translate-y-[-100%]" style:left="{x}px" style:top="{yOffset}px">
+  <div class="py-4 px-8 absolute bg-slate-700 rounded-2xl text-white text-center flex flex-col gap-2 shadow-md translate-x-[-50%] -translate-y-full" style:left="{x}px" style:top="{yOffset}px">
     <span class="text-slate-400">{text}</span>
     <hr class="border-slate-600">
     {#if !addingAmbience && !addingMusic}<button onclick={() => dispatch('click', 'sfx')} class="py-2 px-6 rounded-full hover:bg-slate-900">SFX</button>{/if}

@@ -218,7 +218,7 @@
 
 {#if keyframe.category && keyframe.category !== 'sfx'}
 	<div
-		class="absolute top-0 right-0 bg-slate-600 text-white py-2 px-10 rounded-full shadow select-none"
+		class="absolute top-0 right-0 bg-slate-600 text-white py-2 px-10 rounded-full shadow-sm select-none"
 	>
 		Adding {keyframe.category} ...
 	</div>

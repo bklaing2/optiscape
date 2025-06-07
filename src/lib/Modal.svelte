@@ -13,11 +13,11 @@
 	bind:this={dialog}
 	on:close={() => (show = false)}
 	on:click|self={() => dialog.close()}
-	class="w-[90%] h-[90%] bg-orange-200/20 backdrop-blur rounded-3xl border-4 border-amber-900/60 backdrop:bg-slate-950/30"
+	class="w-[90%] h-[90%] bg-orange-200/20 backdrop-blur-sm rounded-3xl border-4 border-amber-900/60 backdrop:bg-slate-950/30"
 >
 
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div on:click|stopPropagation class="h-full p-4 grid grid-rows-[repeat(2,_min-content)_minmax(min-content,_1fr)_repeat(2,_min-content)] grid-cols-2 gap-6">
+	<div on:click|stopPropagation class="h-full p-4 grid grid-rows-[repeat(2,min-content)_minmax(min-content,1fr)_repeat(2,min-content)] grid-cols-2 gap-6">
 		<slot name="header" />
 		<hr class="col-start-1 col-span-full" />
 		<slot />

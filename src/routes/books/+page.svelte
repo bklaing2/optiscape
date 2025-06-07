@@ -23,7 +23,7 @@
 		name="query"
 		placeholder="Search books"
 		value={query}
-		class="bg-orange-200/60 border border-amber-900/0 w-full h-min mb-6 px-8 py-4 rounded-full outline-none placeholder:text-slate-600 focus:border-amber-900/20 transition"
+		class="bg-orange-200/60 border border-amber-900/0 w-full h-min mb-6 px-8 py-4 rounded-full outline-hidden placeholder:text-slate-600 focus:border-amber-900/20 transition"
 	/>
 </form>
 
