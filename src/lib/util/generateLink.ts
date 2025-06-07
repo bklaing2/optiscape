@@ -1,4 +1,3 @@
-import { PUBLIC_SUPABASE_URL } from "$env/static/public";
 import { decode, encode } from "url-safe-base64";
 
 

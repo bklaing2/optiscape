@@ -3,11 +3,12 @@ import type { RequestHandler } from './$types';
 
 
 export const GET: RequestHandler = async ({ locals }) => {
-	const { supabase } = locals
-	const response = await supabase
-		.from('books')
-		.select('*')
+  // const { supabase } = locals
+  // const response = await supabase
+  // 	.from('books')
+  // 	.select('*')
 
-	if (response.error) error(500, response.error.message)
-	return json(response.data)
+  // if (response.error) error(500, response.error.message)
+  // return json(response.data)
+  return json([])
 };
