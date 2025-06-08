@@ -12,12 +12,12 @@
 	let isActive = $derived(active !== undefined ? active : page.url.pathname === href);
 </script>
 
-<li aria-current={active ? 'page' : undefined}>
+<li class="contents" aria-current={active ? 'page' : undefined}>
 	<a
 		{href}
 		data-sveltekit-noscroll
-		class="py-2 px-5 rounded-full border hover:text-amber-900 hover:bg-orange-200/50 {isActive
-			? 'bg-orange-200/30  border-amber-900/20'
+		class="rounded-full border px-5 py-2 hover:bg-orange-200/50 hover:text-amber-900 {isActive
+			? 'border-amber-900/20  bg-orange-200/30'
 			: 'border-transparent'} {hidden && 'hidden'}"
 	>
 		{@render children?.()}
