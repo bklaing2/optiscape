@@ -1,57 +1,60 @@
 <script lang="ts">
-	import GithubLogo from 'virtual:icons/logos/github-icon';
-
-	interface Props {
-		signedIn: boolean;
-	}
-
-	let { signedIn }: Props = $props();
+	import type { Snippet } from 'svelte'
+	import { LINKS } from '$lib/constants'
+	import GithubLogo from 'virtual:icons/logos/github-icon'
 </script>
 
-<footer class="flex flex-col justify-center items-center gap-x-8 gap-y-4 p-8">
-	<ul class="flex flex-wrap gap-8 justify-center">
-		<li>
-			<a href="/" class="flex gap-1 hover:text-amber-900">
-				<img src="/favicon.png" alt="optiscape icon" class="h-5 aspect-square" />
-				Optiscape
-			</a>
-		</li>
-		<li>
-			<a href="https://github.com/bklaing2/optiscape" class="flex gap-1 hover:text-amber-900">
-				<GithubLogo style="fill: gray;" />GitHub
-			</a>
-		</li>
-		<li>
-			<a href="https://buymeacoffee.com/blaing" class="flex gap-1 hover:text-amber-900"
-				><span>☕️</span>Support the site!</a
-			>
-		</li>
-
-		{#if signedIn}
-			<li>
-				<button class="sign-out" type="submit">sign out</button>
-			</li>
-			<li></li>{/if}
+<footer class="mt-6 grid grid-cols-1 justify-items-center gap-4 px-6">
+	<ul class="contents flex-wrap justify-center gap-6 sm:flex">
+		{@render link('/', home)}
+		{@render link(LINKS.github, github)}
+		{@render link(LINKS.buyMeACoffee, coffee)}
 	</ul>
 
 	<ul class="contents">
-		<li>
-			<p class="text-slate-400">
-				Books provided by <a href="https://standardebooks.org/" class="underline inline"
-					>Standard Ebooks</a
-				>
-			</p>
-		</li>
-		<li>
-			<p class="text-slate-400">
-				Sounds provided by <a href="https://freesound.org/" class="underline inline">Freesound</a>
-			</p>
-		</li>
+		{@render credit(books)}
+		{@render credit(sounds)}
 	</ul>
 </footer>
 
-<!-- <style>
+<!-- Links -->
+{#snippet home()}
+	<img src="/favicon.png" alt="optiscape icon" class="aspect-square h-5" />
+	Optiscape
+{/snippet}
 
-	.sign-out { color: gray; }
+{#snippet github()}
+	<GithubLogo style="fill: gray;" />
+	GitHub
+{/snippet}
 
-</style> -->
+{#snippet coffee()}
+	<span>☕️</span>
+	Support the site!
+{/snippet}
+
+<!-- Credit -->
+{#snippet books()}
+	Books provided by <a href={LINKS.standardEbooks} class="inline underline">Standard Ebooks</a>
+{/snippet}
+
+{#snippet sounds()}
+	Sounds provided by <a href={LINKS.freesound} class="inline underline">Freesound</a>
+{/snippet}
+
+<!-- Wrappers -->
+{#snippet link(href: string, content: Snippet)}
+	<li class="flex items-center gap-1 hover:text-amber-900">
+		<a {href} class="contents">
+			{@render content()}
+		</a>
+	</li>
+{/snippet}
+
+{#snippet credit(content: Snippet)}
+	<li class="text-slate-400 first:mt-6">
+		<p class="contents">
+			{@render content()}
+		</p>
+	</li>
+{/snippet}

@@ -17,5 +17,5 @@
 		{@render children()}
 	</main>
 
-	<Footer signedIn={false} />
+	<Footer />
 </div>
