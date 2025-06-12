@@ -132,6 +132,14 @@
   }
 }
 
+@utility grid-cols-min-l-* {
+  grid-template-columns: max-content repeat(calc(--value(integer) - 1), 1fr);
+}
+
+@utility grid-cols-min-r-* {
+  grid-template-columns: repeat(calc(--value(integer) - 1), 1fr) max-content;
+}
+
 .sideways {
   text-align: center;
   writing-mode: tb-rl;

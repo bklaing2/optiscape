@@ -9,6 +9,7 @@ export interface Book {
   epubUrl: string
   location?: string
   percentage?: number
+  updatedAt?: Date
 }
 
 export interface Keyframe {

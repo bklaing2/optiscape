@@ -1,19 +1,18 @@
-import type { PageServerLoad } from './$types';
-import { error } from '@sveltejs/kit';
+import type { PageServerLoad } from './$types'
+import { error } from '@sveltejs/kit'
 
 import xmldom from "xmldom";
 import { XML } from 'r2-utils-js/dist/es8-es2017/src/_utils/xml-js-mapper'
 import { OPDS } from 'r2-opds-js/dist/es8-es2017/src/opds/opds1/opds'
-import { EntryToBook } from '$lib/util/misc';
+import { EntryToBook } from '$lib/util/misc'
 
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = ({ locals }) => {
   const { fetchBooks } = locals
 
-  return { streamed: { optiscapes: GetBooks() } }
+  return { optiscapes: getBooks() }
 
-
-  async function GetBooks() {
+  async function getBooks() {
     const response = await fetchBooks('all')
     if (response.status !== 200) error(response.status, response.statusText)
 
@@ -23,4 +22,5 @@ export const load: PageServerLoad = async ({ locals }) => {
     const feed = XML.deserialize<OPDS>(xmlDom, OPDS);
     return feed.Entries.slice(0, 10).map(EntryToBook)
   }
-};
+
+}
