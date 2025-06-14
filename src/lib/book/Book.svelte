@@ -28,7 +28,7 @@
 >
   <a
     {href}
-    class="col-span-2 block w-full overflow-hidden rounded-l-[2px] rounded-r-[8px] bg-center shadow-[1px_1px_1px_gray,3px_1px_white,5px_3px_black,6px_4px_4px_gray] transition-all duration-100 ease-in-out group-hover:z-10 group-hover:translate-y-[-15px] group-hover:rotate-[-2deg] group-hover:shadow-[1px_1px_1px_gray,3px_1px_white,5px_3px_black,8px_6px_6px_gray]"
+    class="col-span-full block w-full overflow-hidden rounded-l-[2px] rounded-r-[8px] bg-center shadow-[1px_1px_1px_gray,3px_1px_white,5px_3px_black,6px_4px_4px_gray] transition-all duration-100 ease-in-out group-hover:z-10 group-hover:translate-y-[-15px] group-hover:rotate-[-2deg] group-hover:shadow-[1px_1px_1px_gray,3px_1px_white,5px_3px_black,8px_6px_6px_gray]"
   >
     <!-- Render book cover -->
     <AspectRatio
@@ -41,7 +41,7 @@
   </a>
 
   {#if percentage >= 0.005 && percentage < 0.995}
-    <Progress class="col-span-2 ml-[3px]" value={percentage * 100} />
+    <Progress class="col-span-full ml-[3px]" value={percentage * 100} />
     <!-- <span class="">{Math.round(percentage * 100)}%</span> -->
   {/if}
 

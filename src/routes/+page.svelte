@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { PageProps } from './$types'
   import type { Book } from '$lib/types/types'
+  import { onMount } from 'svelte'
   import { getCurrentlyReading, getHistory } from '$lib/db'
 
   import { ScrollArea } from '$lib/components/ui/scroll-area/index.js'
@@ -13,9 +14,9 @@
   let currentlyReading = $state([] as Book[])
   let history = $state([] as Book[])
 
-  $effect(() => {
-    getCurrentlyReading().then(books => (currentlyReading = books))
-    getHistory().then(books => (history = books))
+  onMount(async () => {
+    currentlyReading = await getCurrentlyReading()
+    history = await getHistory()
   })
 </script>
 
@@ -29,9 +30,9 @@
 
 <div class="grid w-full max-w-full grid-cols-min-r-2 gap-8 gap-x-32">
   {#if currentlyReading.length > 0}
-    <h2 class="col-span-2 text-xl">Currently Reading</h2>
+    <h2 class="col-span-full text-xl">Currently Reading</h2>
 
-    <ScrollArea class="col-span-2 overflow-visible" orientation="horizontal">
+    <ScrollArea class="col-span-full" orientation="horizontal">
       <div class="flex w-max gap-6">
         {#each currentlyReading as book (book.id)}
           <BookView {book} class="w-48" />
@@ -46,7 +47,7 @@
       <SeeAll href="/history" />
     </div>
 
-    <ScrollArea class="col-span-2" orientation="horizontal">
+    <ScrollArea class="col-span-full" orientation="horizontal">
       <div class="flex w-max gap-4">
         {#each history as book (book.id)}
           <BookView {book} class="w-32" />
@@ -60,7 +61,7 @@
     <SeeAll href="/books" />
   </div>
 
-  <ScrollArea class="col-span-2" orientation="horizontal">
+  <ScrollArea class="col-span-full" orientation="horizontal">
     <div class="flex w-max gap-4">
       {#await optiscapes}
         Loading books...
