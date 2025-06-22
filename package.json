@@ -52,6 +52,7 @@
     "dexie": "^4.0.11",
     "dotenv-expand": "^12.0.2",
     "epubjs": "^0.3.93",
+    "foliate-js": "https://github.com/johnfactotum/foliate-js.git#0d4a92ae75b6524f9b75916e4a344298378532d4",
     "r2-opds-js": "^1.0.43",
     "r2-utils-js": "^1.0.38",
     "sst": "3.17.3",

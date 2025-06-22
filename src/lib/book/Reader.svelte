@@ -1,65 +1,27 @@
 <script lang="ts" module>
-  export type CfiLocation = { start: string; end: string }
+  import type { Book } from '$lib/types/types'
 
   export type OnPageTurn = {
-    start: string
-    end: string
-    contents: Contents
-    epub: Epub
-    metadata: Book
-  }
-
-  const SCRIPT = `
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mousedown", onMouseDown);
-    document.addEventListener("mouseup", onMouseUp);
-
-    function onMouseMove(e) {
-      const mouseMoveEvent = new CustomEvent('readermousemove', { detail: { x: e.screenX, y: e.screenY } });
-      window.parent.dispatchEvent(mouseMoveEvent);
-    }
-
-    function onMouseDown(e) {
-      const mouseDownEvent = new CustomEvent('readermousedown', { detail: { x: e.screenX, y: e.screenY } });
-      window.parent.dispatchEvent(mouseDownEvent);
-    }
-
-    function onMouseUp(e) {
-      const mouseUpEvent = new CustomEvent('readermouseup', { detail: { x: e.screenX, y: e.screenY } });
-      window.parent.dispatchEvent(mouseUpEvent);
-    }
-  `
-  const RENDITION_OPTIONS = {
-    manager: 'default',
-    // flow: 'scrolled',
-    // spread: 'always',
-    width: '100%',
-    height: '100%'
-    // snap: true
-    // script: `data:text/javascript;charset=utf-8,${SCRIPT}`,
-    // resizeOnOrientationChange: true,
-    // allowScriptedContent: true
-  }
-
-  const RENDITION_THEME = {
-    body: {
-      width: '100svw',
-      'max-width': '100svw',
-      'box-sizing': 'border-box',
-      'text-align': 'justify'
-    }
+    cfi: string
+    percentage: number
+    content: string
+    bookMetadata: Book
   }
 </script>
 
 <script lang="ts">
-  import type { Book as Epub, Contents } from 'epubjs'
-  // import cfi from '$lib/util/cfi'
-  import ReaderNav from '$lib/buttons/ReaderNav.svelte'
-  import type { Book, Relocated } from '$lib/types/types'
-  import sounds from '$lib/util/sounds'
-  import ePub from 'epubjs'
+  import type {
+    FoliateView,
+    LoadEvent,
+    RelocateEvent
+  } from '$lib/types/foliate'
   import { page } from '$app/state'
+  import { onMount } from 'svelte'
+  import { deepEqual } from '$lib/util/helpers'
+  import { getCurrentlyReading } from '$lib/db'
   import { GetCoverUrl } from '$lib/util/generateLink'
+  import sounds from '$lib/util/sounds'
+  import ReaderNav from '$lib/buttons/ReaderNav.svelte'
 
   interface Props {
     epubUrl: string
@@ -83,106 +45,84 @@
     epubUrl
   } as Book)
 
-  // Setup ePub
-  let epub = $derived(ePub(epubUrl))
-
-  $effect(() => {
-    epub.ready.then(() => {
-      epub.locations
-        .generate(150)
-        .then(() => console.log('Locations generated'))
-      // epub.locations.generate(1000)
-
-      metadata = {
-        id: page.params.id,
-        title: epub.packaging.metadata.title,
-        author: epub.packaging.metadata.creator,
-        coverUrl: GetCoverUrl(epubUrl),
-        epubUrl
-      }
-    })
-
-    return () => epub.destroy()
-  })
-
-  // Setup rendition
-  let rendition = $derived(epub.renderTo('rendition', RENDITION_OPTIONS))
-
-  $effect(() => {
-    rendition.themes.default(RENDITION_THEME)
-    rendition.display(location)
-
-    rendition.on('relocated', dispatchPageTurn)
-    rendition.on('relocated', updateNavButtons)
-    rendition.on('keyup', keyboardNav)
-    // rendition.on('selected', dispatchSelected)
-    // rendition.on('markClicked', e => console.log(e))
-  })
-
-  // Setup everything else
+  // Setup foliate
+  let foliateView: FoliateView
   let atStart = $state(false)
   let atEnd = $state(false)
 
-  // let highlights = [] as Selected[]
+  onMount(async () => {
+    const currentlyReading = await getCurrentlyReading()
+    const saved = currentlyReading.find(b => page.params.id === b.id)
+    location = saved?.location
 
-  // export function Display(location: string) {
-  //   rendition.display(location)
-  // }
+    // @ts-ignore
+    await import('foliate-js/view.js')
+    await foliateView.open(epubUrl)
 
-  // export function Highlight(range: Selected, color?: string) {
-  //   const id = new Date().toString()
-  //   rendition.annotations.highlight(
-  //     range,
-  //     { id: id },
-  //     (e: any) => {
-  //       console.log(e.target)
-  //     },
-  //     undefined,
-  //     color ? { fill: color } : {}
-  //   )
-  //
-  //   highlights.push(range)
-  // }
+    if (location) foliateView.goTo(location)
+    else foliateView.renderer.next()
 
-  // export function RemoveHighlight(range: Selected) {
-  //   rendition.annotations.remove(range, 'highlight')
-  // }
+    const book = foliateView.book
 
-  // export function ClearHighlights() {
-  //   for (const h of highlights) RemoveHighlight(h)
-  //   highlights = []
-  // }
+    metadata = {
+      id: page.params.id,
+      title: book.metadata.title,
+      author: book.metadata.author.name,
+      coverUrl: GetCoverUrl(epubUrl),
+      epubUrl
+    }
 
-  function dispatchPageTurn(page: Relocated) {
+    foliateView.addEventListener('load' as any, onLoad)
+    foliateView.addEventListener('relocate' as any, onRelocate)
+    foliateView.addEventListener('relocate' as any, updateNavButtons)
+  })
+
+  onMount(() => () => foliateView.close())
+
+  function onLoad({ detail: loadMetadata }: LoadEvent) {
+    loadMetadata.doc.addEventListener('keydown', keyboardNav)
+  }
+
+  let prevRelocateMetadata: RelocateEvent['detail']
+
+  function onRelocate({ detail: relocateMetadata }: RelocateEvent) {
+    if (deepEqual(relocateMetadata, prevRelocateMetadata)) return
+
+    const text = relocateMetadata.range.toString()
+
     onPageTurn({
-      start: page.start.cfi,
-      end: page.end.cfi,
-      contents: rendition.getContents(),
-      epub,
-      metadata
+      cfi: relocateMetadata.cfi,
+      percentage: relocateMetadata.fraction,
+      content: text,
+      bookMetadata: metadata
     })
+
+    prevRelocateMetadata = relocateMetadata
   }
 
-  function updateNavButtons(page: Relocated) {
-    atStart = !!page.atStart
-    atEnd = !!page.atEnd
+  function updateNavButtons() {
+    atStart = foliateView.renderer.atStart
+    atEnd = foliateView.renderer.atEnd
   }
 
-  // function dispatchSelected(range: Selected) {
-  //   const [start, end] = cfi.split(range)
-  //   dispatch('selected', { range, start, end })
-  // }
+  function previousPage() {
+    foliateView.goLeft()
+  }
+
+  async function nextPage() {
+    foliateView.goRight()
+  }
 
   function keyboardNav(e: KeyboardEvent) {
     switch (e.key) {
       case 'ArrowLeft':
       case 'ArrowUp':
-        rendition.prev()
+        previousPage()
         break
 
       case 'ArrowRight':
       case 'ArrowDown':
-        rendition.next()
+        nextPage()
         break
     }
   }
@@ -193,18 +133,11 @@
 </svelte:head>
 
 <svelte:window onkeydown={keyboardNav} />
-<!-- onreadermousemove={e => -->
-<!--   dispatch('mousemove', { x: e.detail.x, y: e.detail.y })} -->
-<!-- onreadermousedown={e => -->
-<!--   dispatch('mousedown', { x: e.detail.x, y: e.detail.y })} -->
-<!-- onreadermouseup={e => dispatch('mouseup', { x: e.detail.x, y: e.detail.y })} -->
-<!-- onresize={undefined} -->
 
 <div class="h-full max-w-full">
-  <div id="rendition" class="max-width-full h-full"></div>
-
+  <foliate-view bind:this={foliateView}></foliate-view>
   <div class="flex drop-shadow-lg">
-    <ReaderNav onclick={() => rendition.prev()} side="left" hidden={atStart} />
+    <ReaderNav onclick={() => previousPage()} side="left" hidden={atStart} />
     {#if showPlayButton}
       <button
         onclick={() => sounds.toggle()}
@@ -213,6 +146,6 @@
         {'⏵/⏸'}
       </button>
     {/if}
-    <ReaderNav onclick={() => rendition.next()} side="right" hidden={atEnd} />
+    <ReaderNav onclick={() => nextPage()} side="right" hidden={atEnd} />
   </div>
 </div>
