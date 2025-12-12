@@ -22,6 +22,7 @@ jobs:
       - name: Build project
         env:
           NODE_ENV: production
+          STANDARD_EBOOKS_KEY: ${{ secrets.STANDARD_EBOOKS_KEY }}
         run: bun run build
 
       # Create SPA fallback for static hosting (SvelteKit adapter-static)
