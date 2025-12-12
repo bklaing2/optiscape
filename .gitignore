@@ -16,6 +16,7 @@ vite.config.ts.timestamp-*
 /static/music
 /static/ambience
 /static/sfx
+/static/foliate-js
 
 # sst
 .sst

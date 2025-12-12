@@ -22,6 +22,7 @@
   import { GetCoverUrl } from '$lib/util/generateLink'
   import sounds from '$lib/util/sounds'
   import ReaderNav from '$lib/buttons/ReaderNav.svelte'
+  import { FOLIATE_VIEW } from '$lib/constants'
 
   interface Props {
     epubUrl: string
@@ -55,8 +56,7 @@
     const saved = currentlyReading.find(b => page.params.id === b.id)
     location = saved?.location
 
-    // @ts-ignore
-    await import('foliate-js/view.js')
+    await import(FOLIATE_VIEW)
     await foliateView.open(epubUrl)
 
     if (location) foliateView.goTo(location)

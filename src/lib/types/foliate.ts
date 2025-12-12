@@ -1,7 +1,7 @@
 // Copied from https://github.com/readest/readest/blob/31aeb2289cf597a9db809607d2362a3a8c6d5d66/apps/readest-app/src/types/view.ts
 
 // @ts-ignore
-import { TTS } from 'foliate-js/tts.js';
+import type { TTS } from 'foliate-js/tts.js';
 
 // interface LanguageMap {
 //   [key: string]: string;
