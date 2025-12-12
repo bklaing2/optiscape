@@ -14,7 +14,6 @@
 
   <ul class="contents">
     {@render credit(books)}
-    {@render credit(sounds)}
   </ul>
 </footer>
 
@@ -42,12 +41,6 @@
 {#snippet books()}
   Books provided by <a href={LINKS.standardEbooks} class="inline underline"
     >Standard Ebooks</a
-  >
-{/snippet}
-
-{#snippet sounds()}
-  Sounds provided by <a href={LINKS.freesound} class="inline underline"
-    >Freesound</a
   >
 {/snippet}
 
