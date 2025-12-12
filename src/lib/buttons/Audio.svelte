@@ -1,7 +1,11 @@
 <script lang="ts">
-  export let src: string
-  let audio: HTMLAudioElement
-  let isPlaying = false
+  interface Props {
+    src: string;
+  }
+
+  let { src }: Props = $props();
+  let audio: HTMLAudioElement = $state()
+  let isPlaying = $state(false)
 
   function OnClick () {
     if (isPlaying) {
@@ -16,5 +20,5 @@
 
 
 
-<button on:click={OnClick} type="button" class="select-none">{isPlaying ? '⏸' : '▶️'}</button>
+<button onclick={OnClick} type="button" class="select-none">{isPlaying ? '⏸' : '▶️'}</button>
 <audio {src} bind:this={audio}></audio>

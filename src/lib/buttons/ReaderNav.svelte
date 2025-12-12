@@ -1,25 +1,20 @@
 <script lang="ts">
-  export let side: 'left' | 'right'
-  export let hidden = false
-</script>
+  import { createBubbler } from 'svelte/legacy'
 
+  interface Props {
+    side: 'left' | 'right'
+    hidden?: boolean
+    onclick?: () => void
+  }
+
+  let { side, hidden = false, onclick }: Props = $props()
+</script>
 
 <button
   id="prev"
-  class={`
-    grow
-    py-1
-    bg-orange-200/30
-    border-y
-    border-amber-800/10
-    hover:bg-orange-300/20
-    ${side === 'left' ? 'border-l' : 'border-r'}
-    ${side === 'left' ? 'rounded-l-full' : 'rounded-r-full'}
-    ${hidden && 'invisible'}
-    select-none
-    touch-manipulation
-  `}
-  on:click
+  class={`grow touch-manipulation border-y border-amber-800/10 bg-orange-200/30 py-1 select-none hover:bg-orange-300/20 ${side === 'left' ? 'rounded-l-full border-l' : 'rounded-r-full border-r'} ${hidden && 'invisible'}`}
+  {onclick}
 >
   {side === 'left' ? '‹' : '›'}
 </button>
+

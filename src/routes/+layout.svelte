@@ -1,17 +1,21 @@
-<script>
-	import Header from './Header.svelte';
-	import '../app.css';
-	import './styles.css';
-	import Footer from './Footer.svelte';
+<script lang="ts">
+  import type { LayoutProps } from './$types'
+  import '../app.css'
+  import './styles.css'
+  import Header from './Header.svelte'
+  import Footer from './Footer.svelte'
+
+  let { children }: LayoutProps = $props()
 </script>
 
 <div
-	class="grid grid-rows-[min-content_minmax(min-content,_1fr)_min-content] grid-cols-1 gap-8 pb-16 h-full max-w-4xl mx-auto"
+  class="mx-auto grid w-full max-w-4xl grid-cols-1 grid-rows-[min-content_minmax(min-content,1fr)_min-content] gap-8 pb-16"
 >
-	<Header />
+  <Header />
 
-	<main class="w-full flex flex-col px-4 box-border"><slot /></main>
+  <main class="box-border flex w-full flex-col px-4">
+    {@render children()}
+  </main>
 
-	<Footer signedIn={false} />
+  <Footer />
 </div>
-

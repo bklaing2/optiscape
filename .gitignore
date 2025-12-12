@@ -11,8 +11,8 @@ node_modules
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 /.vercel
-/supabase
 /static/books
 /static/music
 /static/ambience
 /static/sfx
+/static/foliate-js

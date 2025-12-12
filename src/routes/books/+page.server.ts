@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
   const entry = searchParams.get('entry') || ''
   const query = searchParams.get('query') || ''
 
-  return { streamed: { books: FetchBooks(category, entry) } }
+  return { books: FetchBooks(category, entry) }
 
 
   async function FetchBooks(category: string, entry: string) {
@@ -26,14 +26,13 @@ export const load: PageServerLoad = async ({ locals, url }) => {
       entry = ''
     }
 
-    const response = await fetchBooks(`https://standardebooks.org/feeds/opds/${category}/${entry}${query ? '?query=' + query : ''}`)
+    const response = await fetchBooks(`${category}/${entry}${query ? '?query=' + query : ''}`)
     if (response.status !== 200) error(response.status, response.statusText)
 
     const xmlDom = new xmldom.DOMParser().parseFromString(await response.text())
     if (!xmlDom || !xmlDom.documentElement) error(500, 'Error parsing XML')
 
     const feed = XML.deserialize<OPDS>(xmlDom, OPDS);
-    // console.log(feed.Entries[0])
     return feed.Entries?.map(EntryToBook)
       .filter(b => !query || b.title.toLowerCase().includes(query.toLowerCase()) || b.author.toLowerCase().includes(query.toLowerCase()))
       || []

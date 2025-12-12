@@ -12,14 +12,14 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
   const category = searchParams.get('category') || ''
   const filter = searchParams.get('filter') || ''
 
-  const categories = FetchCategories()
-  const entries = FetchEntries(category)
-
-  return { streamed: { categories, entries } }
+  return {
+    categories: FetchCategories(),
+    entries: FetchEntries(category)
+  }
 
 
   async function FetchCategories() {
-    const response = await fetchBooks(`https://standardebooks.org/feeds/opds`)
+    const response = await fetchBooks()
     if (response.status !== 200) error(response.status, response.statusText)
 
     const xmlDom = new xmldom.DOMParser().parseFromString(await response.text())
@@ -38,7 +38,7 @@ export const load: LayoutServerLoad = async ({ locals, url }) => {
   async function FetchEntries(category: string) {
     if (!category || category === 'new-releases') return []
 
-    const response = await fetchBooks(`https://standardebooks.org/feeds/opds/${category}`)
+    const response = await fetchBooks(category)
     if (response.status !== 200) error(response.status, response.statusText)
 
     const xmlDom = new xmldom.DOMParser().parseFromString(await response.text())

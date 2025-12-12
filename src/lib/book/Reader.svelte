@@ -1,163 +1,151 @@
-<script lang="ts" context="module">
-	export type CfiLocation = { start: string; end: string };
+<script lang="ts" module>
+  import type { Book } from '$lib/types/types'
+
+  export type OnPageTurn = {
+    cfi: string
+    percentage: number
+    content: string
+    bookMetadata: Book
+  }
 </script>
 
 <script lang="ts">
-	import { createEventDispatcher, onMount } from 'svelte';
-	import type { Book, Contents, NavItem, Rendition } from 'epubjs';
-	import cfi from '$lib/util/cfi';
-	import ReaderNav from '$lib/buttons/ReaderNav.svelte';
-	import type { Relocated, Selected } from '$lib/types/types';
-	import sounds from '$lib/util/sounds';
+  import type {
+    FoliateView,
+    LoadEvent,
+    RelocateEvent
+  } from '$lib/types/foliate'
+  import { page } from '$app/state'
+  import { onMount } from 'svelte'
+  import { deepEqual } from '$lib/util/helpers'
+  import { getCurrentlyReading } from '$lib/db'
+  import { GetCoverUrl } from '$lib/util/generateLink'
+  import sounds from '$lib/util/sounds'
+  import ReaderNav from '$lib/buttons/ReaderNav.svelte'
+  import { FOLIATE_VIEW } from '$lib/constants'
 
-	export let epub: Book;
-	export let location: string | undefined = undefined;
-	export let showPlayButton = false;
+  interface Props {
+    epubUrl: string
+    location?: string | undefined
+    showPlayButton?: boolean
+    onPageTurn?: (args: OnPageTurn) => void
+  }
 
-	let rendition: Rendition;
-	let atStart = false,
-		atEnd = false;
+  let {
+    epubUrl,
+    location = undefined,
+    showPlayButton = false,
+    onPageTurn = () => {}
+  }: Props = $props()
 
-	let highlights = [] as Selected[];
+  let metadata = $state({
+    id: page.params.id,
+    title: '',
+    author: '',
+    coverUrl: GetCoverUrl(epubUrl),
+    epubUrl
+  } as Book)
 
-	export function Display(location: string) {
-		rendition.display(location);
-	}
+  // Setup foliate
+  let foliateView: FoliateView
+  let atStart = $state(false)
+  let atEnd = $state(false)
 
-	export function Highlight(range: Selected, color?: string) {
-		const id = new Date().toString();
-		rendition.annotations.highlight(
-			range,
-			{ id: id },
-			(e: any) => {
-				console.log(e.target);
-			},
-			undefined,
-			color ? { fill: color } : {}
-		);
+  onMount(async () => {
+    const currentlyReading = await getCurrentlyReading()
+    const saved = currentlyReading.find(b => page.params.id === b.id)
+    location = saved?.location
 
-		highlights.push(range);
-	}
+    await import(FOLIATE_VIEW)
+    await foliateView.open(epubUrl)
 
-	export function RemoveHighlight(range: Selected) {
-		rendition.annotations.remove(range, 'highlight');
-	}
+    if (location) foliateView.goTo(location)
+    else foliateView.renderer.next()
 
-	export function ClearHighlights() {
-		for (const h of highlights) RemoveHighlight(h);
-		highlights = [];
-	}
+    const book = foliateView.book
 
-	const dispatch = createEventDispatcher<{
-		selected: CfiLocation & { range: string };
-		pageTurned: CfiLocation & { contents: Contents };
-		mousemove: { x: number; y: number };
-		mousedown: { x: number; y: number };
-		mouseup: { x: number; y: number };
-	}>();
-
-	onMount(() => {
-		rendition = epub.renderTo('rendition', {
-			// manager: "continuous",
-			flow: 'paginated',
-			width: '100%',
-			height: '100%',
-			script: `data:text/javascript;charset=utf-8,${script}`,
-			resizeOnOrientationChange: true,
-			allowScriptedContent: true
-		});
-
-		rendition.themes.default({
-			body: {
-				width: '100svw',
-				'max-width': '100svw',
-				'box-sizing': 'border-box',
-				'text-align': 'justify'
-			}
-		});
-
-		rendition.display(location);
-
-		rendition.on('relocated', displayNavButtons);
-		rendition.on('relocated', dispatchPageTurned);
-		rendition.on('selected', dispatchSelected);
-		rendition.on('keyup', keyboardNav);
-
-		// rendition.on('markClicked', e => console.log(e))
-	});
-
-	const script = `
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mousedown", onMouseDown);
-    document.addEventListener("mouseup", onMouseUp);
-
-    function onMouseMove(e) {
-      const mouseMoveEvent = new CustomEvent('readermousemove', { detail: { x: e.screenX, y: e.screenY } });
-      window.parent.dispatchEvent(mouseMoveEvent);
+    metadata = {
+      id: page.params.id,
+      title: book.metadata.title,
+      author: book.metadata.author.name,
+      coverUrl: GetCoverUrl(epubUrl),
+      epubUrl
     }
 
-    function onMouseDown(e) {
-      const mouseDownEvent = new CustomEvent('readermousedown', { detail: { x: e.screenX, y: e.screenY } });
-      window.parent.dispatchEvent(mouseDownEvent);
+    foliateView.addEventListener('load' as any, onLoad)
+    foliateView.addEventListener('relocate' as any, onRelocate)
+    foliateView.addEventListener('relocate' as any, updateNavButtons)
+  })
+
+  onMount(() => () => foliateView.close())
+
+  function onLoad({ detail: loadMetadata }: LoadEvent) {
+    loadMetadata.doc.addEventListener('keydown', keyboardNav)
+  }
+
+  let prevRelocateMetadata: RelocateEvent['detail']
+
+  function onRelocate({ detail: relocateMetadata }: RelocateEvent) {
+    if (deepEqual(relocateMetadata, prevRelocateMetadata)) return
+
+    const text = relocateMetadata.range.toString()
+
+    onPageTurn({
+      cfi: relocateMetadata.cfi,
+      percentage: relocateMetadata.fraction,
+      content: text,
+      bookMetadata: metadata
+    })
+
+    prevRelocateMetadata = relocateMetadata
+  }
+
+  function updateNavButtons() {
+    atStart = foliateView.renderer.atStart
+    atEnd = foliateView.renderer.atEnd
+  }
+
+  function previousPage() {
+    foliateView.goLeft()
+  }
+
+  async function nextPage() {
+    foliateView.goRight()
+  }
+
+  function keyboardNav(e: KeyboardEvent) {
+    switch (e.key) {
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        previousPage()
+        break
+
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextPage()
+        break
     }
-
-    function onMouseUp(e) {
-      const mouseUpEvent = new CustomEvent('readermouseup', { detail: { x: e.screenX, y: e.screenY } });
-      window.parent.dispatchEvent(mouseUpEvent);
-    }
-  `;
-
-	function displayNavButtons(page: Relocated) {
-		atStart = !!page.atStart;
-		atEnd = !!page.atEnd;
-	}
-
-	function dispatchPageTurned(page: Relocated) {
-		dispatch('pageTurned', {
-			start: page.start.cfi,
-			end: page.end.cfi,
-			contents: rendition.getContents()
-		});
-	}
-
-	function dispatchSelected(range: Selected) {
-		const [start, end] = cfi.split(range);
-		dispatch('selected', { range, start, end });
-	}
-
-	function keyboardNav(e: KeyboardEvent) {
-		switch (e.key) {
-			case 'ArrowLeft':
-			case 'ArrowUp':
-				rendition.prev();
-				break;
-
-			case 'ArrowRight':
-			case 'ArrowDown':
-				rendition.next();
-				break;
-		}
-	}
+  }
 </script>
 
-<svelte:window
-	on:keydown={keyboardNav}
-	on:readermousemove={(e) => dispatch('mousemove', { x: e.detail.x, y: e.detail.y })}
-	on:readermousedown={(e) => dispatch('mousedown', { x: e.detail.x, y: e.detail.y })}
-	on:readermouseup={(e) => dispatch('mouseup', { x: e.detail.x, y: e.detail.y })}
-	on:resize={undefined}
-/>
+<svelte:head>
+  <title>Reading: {metadata.title}</title>
+</svelte:head>
 
-<div class="max-w-full h-full">
-	<div id="rendition" class="max-width-full h-96" />
+<svelte:window onkeydown={keyboardNav} />
 
-	<div class="flex drop-shadow-lg">
-		<ReaderNav on:click={() => rendition.prev()} side="left" hidden={atStart} />
-		<button
-			on:click={() => sounds.toggle()}
-			class="py-1 px-2 bg-orange-200/30 border border-amber-800/10 hover:bg-orange-300/20 select-none"
-			style:display={showPlayButton ? undefined : 'none'}>{'⏵/⏸'}</button
-		>
-		<ReaderNav on:click={() => rendition.next()} side="right" hidden={atEnd} />
-	</div>
+<div class="h-full max-w-full">
+  <foliate-view bind:this={foliateView}></foliate-view>
+  <div class="flex drop-shadow-lg">
+    <ReaderNav onclick={() => previousPage()} side="left" hidden={atStart} />
+    {#if showPlayButton}
+      <button
+        onclick={() => sounds.toggle()}
+        class="border border-amber-800/10 bg-orange-200/30 px-2 py-1 select-none hover:bg-orange-300/20"
+      >
+        {'⏵/⏸'}
+      </button>
+    {/if}
+    <ReaderNav onclick={() => nextPage()} side="right" hidden={atEnd} />
+  </div>
 </div>
