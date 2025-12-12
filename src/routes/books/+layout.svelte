@@ -3,6 +3,7 @@
   import { page } from '$app/state'
   import { ScrollArea } from '$lib/components/ui/scroll-area/index.js'
   import NavLink from '$lib/buttons/NavLink.svelte'
+  import { resolve } from '$app/paths'
 
   let { data, children }: LayoutProps = $props()
   let { categories, entries } = $derived(data)
@@ -17,13 +18,14 @@
 
   <ScrollArea class="col-span-full" orientation="horizontal">
     <ul class="flex w-max">
-      <NavLink href="/books" active={!category}>ALL BOOKS</NavLink>
+      <NavLink href={resolve('/books')} active={!category}>ALL BOOKS</NavLink>
       {#await categories}
         Loading categories...
       {:then categories}
         {#each categories as c}
-          <NavLink href="/books?category={c.id}" active={c.id === category}
-            >{c.text}</NavLink
+          <NavLink
+            href={resolve(`/books?category=${c.id}`)}
+            active={c.id === category}>{c.text}</NavLink
           >
         {/each}
       {/await}
@@ -51,7 +53,7 @@
         <ul class="flex w-max">
           {#each entries as e}
             <NavLink
-              href="/books?category={category}&entry={e.id}"
+              href={resolve(`/books?category=${category}&entry=${e.id}`)}
               active={e.id === entry}
             >
               {e.text}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from '$app/paths'
   import type { PageProps } from './$types'
   import type { Book } from '$lib/types/types'
   import { onMount } from 'svelte'
@@ -44,7 +45,7 @@
   {#if history.length > 0}
     <h2>History</h2>
     <div class="justify-self-end">
-      <SeeAll href="/history" />
+      <SeeAll href={resolve('/history')} />
     </div>
 
     <ScrollArea class="col-span-full" orientation="horizontal">
@@ -58,7 +59,7 @@
 
   <h2 class="text-xl">Optiscape books</h2>
   <div class="justify-self-end">
-    <SeeAll href="/books" />
+    <SeeAll href={resolve('/books')} />
   </div>
 
   <ScrollArea class="col-span-full" orientation="horizontal">

@@ -2,6 +2,7 @@
   import type { Book } from '$lib/types/types'
   import { AspectRatio } from '$lib/components/ui/aspect-ratio/index.js'
   import { Progress } from '$lib/components/ui/progress/index.js'
+  import { resolve } from '$app/paths'
 
   interface Props {
     book: Book
@@ -20,7 +21,7 @@
   }: Props = $props()
 
   let percentage = $derived(book.percentage ? book.percentage : -1)
-  let href = $derived(`/${edit ? 'edit' : 'read'}/${book.id}`)
+  let href = $derived(resolve(`/${edit ? 'edit' : 'read'}/${book.id}`))
 </script>
 
 <div

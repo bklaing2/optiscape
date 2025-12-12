@@ -3,16 +3,21 @@
   import NavLink from '$lib/buttons/NavLink.svelte'
   import MenuIcon from 'virtual:icons/tabler/menu-2'
   import CloseIcon from 'virtual:icons/tabler/x'
+  import { resolve } from '$app/paths'
 
   let showNav = $state(false)
 </script>
 
 <header class="group my-6 flex w-full items-center px-6">
   <a
-    href="/"
+    href={resolve('/')}
     class={`absolute flex items-center gap-2 overflow-hidden text-xl text-amber-900 transition-all sm:justify-end ${showNav ? 'max-sm:opacity-0' : 'max-sm:delay-100 max-sm:duration-250'}`}
   >
-    <img src="/favicon.png" alt="optiscape icon" class="aspect-square h-8" />
+    <img
+      src={resolve('/favicon.png')}
+      alt="optiscape icon"
+      class="aspect-square h-8"
+    />
     Optiscape
   </a>
 
@@ -23,9 +28,9 @@
       class={`flex  scrollbar-hidden grow gap-x-1 overflow-x-auto transition-all ease-out sm:max-w-500 ${showNav ? 'max-sm:max-w-500 max-sm:delay-100 max-sm:duration-1000' : 'max-sm:max-w-0'}`}
     >
       <ul class="contents">
-        <NavLink href="/">Home</NavLink>
-        <NavLink href="/books">Books</NavLink>
-        <NavLink href="/about">About</NavLink>
+        <NavLink href={resolve('/')}>Home</NavLink>
+        <NavLink href={resolve('/books')}>Books</NavLink>
+        <NavLink href={resolve('/about')}>About</NavLink>
       </ul>
     </nav>
 
