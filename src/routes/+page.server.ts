@@ -6,8 +6,6 @@ import { XML } from 'r2-utils-js/dist/es8-es2017/src/_utils/xml-js-mapper'
 import { OPDS } from 'r2-opds-js/dist/es8-es2017/src/opds/opds1/opds'
 import { EntryToBook } from '$lib/util/misc'
 
-export const prerender = false;
-
 export const load: PageServerLoad = async ({ locals }) => {
   const { fetchBooks } = locals;
 
