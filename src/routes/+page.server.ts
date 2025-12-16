@@ -9,7 +9,7 @@ import { EntryToBook } from '$lib/util/misc'
 export const load: PageServerLoad = async ({ locals }) => {
   const { fetchBooks } = locals;
 
-  return { optiscapes: await getBooks() }
+  return { optiscapes: getBooks() }
 
   async function getBooks() {
     const response = await fetchBooks('all')
