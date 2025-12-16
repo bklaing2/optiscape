@@ -16,24 +16,24 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: bun install
 
-      - name: Build project
+      - name: Build
         env:
-          NODE_ENV: production
+          BASE_PATH: '/${{ github.event.repository.name }}'
           STANDARD_EBOOKS_KEY: ${{ secrets.STANDARD_EBOOKS_KEY }}
         run: bun run build
 
-      # Upload the static output folder produced by adapter-static
-      - name: Upload static files as artifact
-        id: deployment
+      - name: Upload Artifacts
         uses: actions/upload-pages-artifact@v4
         with:
           path: build/
 
   deploy:
     needs: build
+    runs-on: ubuntu-latest
+
     permissions:
       pages: write
       id-token: write
@@ -41,8 +41,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
 
     steps:
       - name: Deploy to GitHub Pages

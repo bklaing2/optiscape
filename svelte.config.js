@@ -9,7 +9,7 @@ const config = {
 
   kit: {
     paths: {
-      base: process.env.NODE_ENV == 'production' ? '/optiscape' : ''
+      base: process.argv.includes('dev') ? '' : process.env.BASE_PATH
     },
     adapter: adapter({ fallback: '404.html' })
   }
