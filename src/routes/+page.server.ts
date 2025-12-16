@@ -10,17 +10,14 @@ import { EntryToBook } from '$lib/util/misc'
 export const load: PageServerLoad = async ({ locals }) => {
   const { fetchBooks } = locals
 
-  return { optiscapes: await getBooks() }
+  console.log("Fetching books from Standard Ebooks...")
+  const response = await fetchBooks('all')
+  if (response.status !== 200) error(response.status, response.statusText)
 
-  async function getBooks() {
-    const response = await fetchBooks('all')
-    if (response.status !== 200) error(response.status, response.statusText)
+  const xmlDom = new xmldom.DOMParser().parseFromString(await response.text())
+  if (!xmlDom || !xmlDom.documentElement) error(500, 'Error parsing XML')
 
-    const xmlDom = new xmldom.DOMParser().parseFromString(await response.text())
-    if (!xmlDom || !xmlDom.documentElement) error(500, 'Error parsing XML')
-
-    const feed = XML.deserialize<OPDS>(xmlDom, OPDS);
-    return feed.Entries.slice(0, 10).map(EntryToBook)
-  }
-
+  const feed = XML.deserialize<OPDS>(xmlDom, OPDS);
+  console.log("Done")
+  return { optiscapes: feed.Entries.slice(0, 10).map(EntryToBook) }
 }
