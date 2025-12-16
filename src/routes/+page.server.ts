@@ -5,11 +5,10 @@ import xmldom from "xmldom";
 import { XML } from 'r2-utils-js/dist/es8-es2017/src/_utils/xml-js-mapper'
 import { OPDS } from 'r2-opds-js/dist/es8-es2017/src/opds/opds1/opds'
 import { EntryToBook } from '$lib/util/misc'
+import fetchBooks from '$lib/standardEbooks';
 
 
-export const load: PageServerLoad = async ({ locals }) => {
-  const { fetchBooks } = locals
-
+export const load: PageServerLoad = async () => {
   console.log("Fetching books from Standard Ebooks...")
   const response = await fetchBooks('all')
   if (response.status !== 200) error(response.status, response.statusText)
