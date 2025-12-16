@@ -23,7 +23,7 @@ jobs:
         env:
           BASE_PATH: '/${{ github.event.repository.name }}'
           STANDARD_EBOOKS_KEY: ${{ secrets.STANDARD_EBOOKS_KEY }}
-        run: STANDARD_EBOOKS_KEY="${{ secrets.STANDARD_EBOOKS_KEY }}" bun run build
+        run: bun run build
 
       - name: Upload Artifacts
         uses: actions/upload-pages-artifact@v4
