@@ -1,16 +1,15 @@
+<script lang="ts" module>
+  import { SEARCH_PARAMS } from '$lib/constants'
+  const { COLLECTION, SHELF, FILTER_SHELVES } = SEARCH_PARAMS
+</script>
+
 <script lang="ts">
   import type { LayoutProps } from './$types'
-  import { page } from '$app/state'
   import { ScrollArea } from '$lib/components/ui/scroll-area/index.js'
   import NavLink from '$lib/buttons/NavLink.svelte'
   import { resolve } from '$app/paths'
 
   let { data, children }: LayoutProps = $props()
-  let { categories, entries } = $derived(data)
-  let searchParams = $derived(page.url.searchParams)
-  let category = $derived(searchParams.get('category'))
-  let entry = $derived(searchParams.get('entry'))
-  let filter = $derived(searchParams.get('filter'))
 </script>
 
 <div class="grid w-full max-w-full grid-cols-min-r-2 gap-2">
@@ -18,51 +17,48 @@
 
   <ScrollArea class="col-span-full" orientation="horizontal">
     <ul class="flex w-max">
-      <NavLink href={resolve('/books')} active={!category}>ALL BOOKS</NavLink>
-      {#await categories}
-        Loading categories...
-      {:then categories}
-        {#each categories as c}
-          <NavLink
-            href={resolve(`/books?category=${c.id}`)}
-            active={c.id === category}>{c.text}</NavLink
-          >
-        {/each}
-      {/await}
+      {#each data.collections as collection}
+        <NavLink
+          href={resolve(`/books${collection.searchParams}`)}
+          active={collection.id === data.searchParams[COLLECTION]}
+          >{collection.text}</NavLink
+        >
+      {/each}
     </ul>
   </ScrollArea>
 
-  {#await entries}
-    Loading entries...
-  {:then entries}
-    {#if entries.length > 0}
-      <form action="/books" class="contents">
-        {#each [...searchParams.entries()].filter(([k]) => k !== 'filter') as [key, value]}
-          <input type="hidden" name={key} {value} />
-        {/each}
-        <input
-          type="text"
-          name="filter"
-          placeholder="Search subcategories..."
-          value={filter}
-          class="col-span-full mt-6 h-min rounded-full border border-amber-900/0 bg-orange-200/60 px-6 py-1 outline-hidden transition placeholder:text-slate-600 focus:border-amber-900/20"
-        />
-      </form>
+  {#if data.shelves.length > 0}
+    <!-- Filter subsection input -->
+    <form action="/books" class="contents">
+      <!-- Include current search params as hidden inputs to be passed on form submission -->
+      {#each Object.entries(data.searchParams)
+        .filter(([, v]) => v)
+        .filter(([k]) => k !== FILTER_SHELVES) as [key, value]}
+        <input type="hidden" name={key} {value} />
+      {/each}
+      <input
+        type="text"
+        name={FILTER_SHELVES}
+        placeholder="Search {data.searchParams[COLLECTION]}..."
+        value={data.searchParams[FILTER_SHELVES]}
+        class="col-span-full mt-6 h-min rounded-full border border-amber-900/0 bg-orange-200/60 px-6 py-1 outline-hidden transition placeholder:text-slate-600 focus:border-amber-900/20"
+      />
+    </form>
 
-      <ScrollArea class="col-span-full mb-6" orientation="horizontal">
-        <ul class="flex w-max">
-          {#each entries as e}
-            <NavLink
-              href={resolve(`/books?category=${category}&entry=${e.id}`)}
-              active={e.id === entry}
-            >
-              {e.text}
-            </NavLink>
-          {/each}
-        </ul>
-      </ScrollArea>
-    {/if}
-  {/await}
+    <!-- Subsection nav buttons -->
+    <ScrollArea class="col-span-full mb-6" orientation="horizontal">
+      <ul class="flex w-max">
+        {#each data.shelves as shelf}
+          <NavLink
+            href={resolve(`/books${shelf.searchParams}`)}
+            active={shelf.id === data.searchParams[SHELF]}
+          >
+            {shelf.text}
+          </NavLink>
+        {/each}
+      </ul>
+    </ScrollArea>
+  {/if}
 
   <div class="col-span-full grid grid-cols-3 gap-x-2 sm:grid-cols-5">
     {@render children?.()}
