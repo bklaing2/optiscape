@@ -11,7 +11,7 @@ export const load: PageLoad = async ({ parent, url }) => {
 
   const collection = data.collections.find(c => searchParams[COLLECTION] === c.id)
   const shelf = collection?.subsections.find(s => searchParams[SHELF] === s.id)
-  const books = [...(collection?.books ?? []), ...(shelf?.books ?? [])].filter(
+  const books = [...(searchParams[SHELF] ? (shelf?.books ?? []) : [...(collection?.books ?? []), ...(collection?.subsections.flatMap(s => s.books) ?? [])])].filter(
     b =>
       !searchParams[FILTER_BOOKS] ||
       b.title
