@@ -5,13 +5,14 @@
 
 <script lang="ts">
   import type { PageProps } from './$types'
+  import { resolve } from '$app/paths'
   import BookView from '$lib/book/Book.svelte'
 
   let { data }: PageProps = $props()
   let showEditIcon = false // $derived(searchParams.has('edit'))
 </script>
 
-<form action="/books" class="contents">
+<form action={resolve('/books')} class="contents">
   {#each Object.entries(data.searchParams)
     .filter(([, v]) => v)
     .filter(([k]) => k !== FILTER_BOOKS) as [key, value]}

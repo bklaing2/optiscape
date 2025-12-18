@@ -5,9 +5,9 @@
 
 <script lang="ts">
   import type { LayoutProps } from './$types'
+  import { resolve } from '$app/paths'
   import { ScrollArea } from '$lib/components/ui/scroll-area/index.js'
   import NavLink from '$lib/buttons/NavLink.svelte'
-  import { resolve } from '$app/paths'
 
   let { data, children }: LayoutProps = $props()
 </script>
@@ -29,7 +29,7 @@
 
   {#if data.shelves.length > 0}
     <!-- Filter subsection input -->
-    <form action="/books" class="contents">
+    <form action={resolve('/books')} class="contents">
       <!-- Include current search params as hidden inputs to be passed on form submission -->
       {#each Object.entries(data.searchParams)
         .filter(([, v]) => v)
