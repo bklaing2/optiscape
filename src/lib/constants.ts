@@ -4,6 +4,7 @@ export const SEARCH_PARAMS = {
   COLLECTION: 'collection',
   SHELF: 'shelf',
   FILTER_SHELVES: 'filter-shelves',
+  FILTER_BOOKS: 'filter-books',
 } as const
 
 
