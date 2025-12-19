@@ -56,7 +56,7 @@
     const saved = currentlyReading.find(b => page.params.id === b.id)
     location = saved?.location
 
-    await import(FOLIATE_VIEW)
+    await import(/* @vite-ignore */ FOLIATE_VIEW)
     await foliateView.open(epubUrl)
 
     if (location) foliateView.goTo(location)
