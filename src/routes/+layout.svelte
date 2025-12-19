@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { LayoutProps } from './$types'
   import '../app.css'
-  import './styles.css'
   import Header from './Header.svelte'
   import Footer from './Footer.svelte'
 
