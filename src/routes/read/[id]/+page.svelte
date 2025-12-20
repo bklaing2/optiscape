@@ -16,6 +16,16 @@
     handleReadingRate()
     updateReadingRate(readingRate)
 
+    // Request LLM for ambience, background music, and sound effects...
+
+    // For the prompt
+    // Outline what I expect fit to do
+    // Provide an example of what it should do
+    // Provide an example of the expected output
+    // Provide the content of the passage
+
+    // I can even generate the sounds on the fly using LLMs!
+
     async function handleReadingRate() {
       // Calculate reading rate
       const elapsedMinutes = (Date.now() - startTime) / 60000

@@ -134,7 +134,7 @@
 
 <svelte:window onkeydown={keyboardNav} />
 
-<div class="h-full max-w-full">
+<div class="m-auto h-full w-full max-w-lg">
   <foliate-view bind:this={foliateView}></foliate-view>
   <div class="flex drop-shadow-lg">
     <ReaderNav onclick={() => previousPage()} side="left" hidden={atStart} />
