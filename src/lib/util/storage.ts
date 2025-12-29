@@ -1,11 +1,23 @@
+import type { Settings } from '$lib/types';
 import type { Book } from '$lib/types/types';
 import RollingAverage, { type IRollingAverage } from './rollingAverage'
 
 const STORAGE_KEYS = {
+  SETTINGS: 'settings',
   HISTORY: 'history',
   EDIT_HISTORY: 'editHistory',
   READING_RATE: 'readingRate'
 } as const;
+
+// Settings //////////////////////////////////////
+export function loadSettings(): Settings {
+  const settings = localStorage.getItem(STORAGE_KEYS.SETTINGS)
+  return settings ? JSON.parse(settings) : {}
+}
+
+export function updateSettings(settings: Settings) {
+  localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings))
+}
 
 // History ///////////////////////////////////////
 export function loadHistory(): Book[] {
