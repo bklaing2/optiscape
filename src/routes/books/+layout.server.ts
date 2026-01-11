@@ -14,23 +14,24 @@ export const load: LayoutServerLoad = async ({ locals }) => {
   const { fetchStandardEbooksEntries } = locals
 
   // Fetch top-level collections (new releases, subjects, etc.) and populate all their subsections/books
-  const collections = (await Promise.all((await fetchStandardEbooksEntries())
-    .map(e => ({ id: Id(e), text: Text(e) }))
-    .sort((a, b) => a.id.localeCompare(b.id))
-    .map(PopulateEntries)
-  )
-  ).map(c => c.id === 'all' ? { ...c, id: null } : c)
+  let collections = []
+  for (const entry of await fetchStandardEbooksEntries()) {
+    const collection = await PopulateEntries({ id: Id(entry), text: Text(entry) })
+    if (collection.id === 'all') collections.unshift({ ...collection, id: null })
+    else collections.push(collection)
+  }
+
   return { collections }
 
   async function PopulateEntries<T extends ID<string>>(collection: T) {
     // Fetch all entries (books or subsections) for this collection
     const entries = await fetchStandardEbooksEntries(collection.id)
     const books = entries.filter(IsNotSubsection).map(EntryToBook)
-    const subsections = await Promise.all(entries
-      .filter(IsSubsection)
-      .map(e => ({ id: Id(e), text: e.Title }))
-      .map(PopulateBooks)
-    )
+
+    const subsections = []
+    for (const entry of entries.filter(IsSubsection))
+      subsections.push(await PopulateBooks({ id: Id(entry), text: entry.Title }))
+
     return { ...collection, books, subsections }
 
     async function PopulateBooks<T extends ID<string>>(subsection: T) {
