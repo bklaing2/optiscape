@@ -65,6 +65,11 @@ export function updateReadingRate(readingRate: RollingAverage) {
   localStorage.setItem(STORAGE_KEYS.READING_RATE, JSON.stringify(readingRate))
 }
 
+export const readingRate = {
+  load: loadReadingRate,
+  update: updateReadingRate
+}
+
 const storage = {
   updateHistory,
   loadHistory,

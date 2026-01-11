@@ -20,7 +20,6 @@
   import { deepEqual } from '$lib/util/helpers'
   import { getCurrentlyReading } from '$lib/db'
   import { GetCoverUrl } from '$lib/util/generateLink'
-  import sounds from '$lib/util/sounds'
   import ReaderNav from '$lib/buttons/ReaderNav.svelte'
   import { FOLIATE_VIEW } from '$lib/constants'
 
@@ -28,14 +27,18 @@
     epubUrl: string
     location?: string | undefined
     showPlayButton?: boolean
+    isPlaying?: boolean
     onPageTurn?: (args: OnPageTurn) => void
+    onPlayPause?: () => void
   }
 
   let {
     epubUrl,
     location = undefined,
     showPlayButton = false,
-    onPageTurn = () => {}
+    isPlaying = false,
+    onPageTurn = () => {},
+    onPlayPause = () => {}
   }: Props = $props()
 
   let metadata = $state({
@@ -134,16 +137,16 @@
 
 <svelte:window onkeydown={keyboardNav} />
 
-<div class="h-full max-w-full">
+<div class="m-auto h-full w-full max-w-lg">
   <foliate-view bind:this={foliateView}></foliate-view>
   <div class="flex drop-shadow-lg">
     <ReaderNav onclick={() => previousPage()} side="left" hidden={atStart} />
     {#if showPlayButton}
       <button
-        onclick={() => sounds.toggle()}
+        onclick={onPlayPause}
         class="border border-amber-800/10 bg-orange-200/30 px-2 py-1 select-none hover:bg-orange-300/20"
       >
-        {'⏵/⏸'}
+        {isPlaying ? '⏵' : '⏸'}
       </button>
     {/if}
     <ReaderNav onclick={() => nextPage()} side="right" hidden={atEnd} />

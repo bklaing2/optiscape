@@ -2,7 +2,39 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs));
+}
+
+export function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
+  fn: T,
+  delay: number,
+): (...args: Parameters<T>) => ReturnType<T> {
+  let lastCall = -Infinity;
+  let lastResult: ReturnType<T>;
+
+  return (...args: Parameters<T>) => {
+    const now = Date.now();
+    const timeSinceLastCall = now - lastCall;
+
+    if (timeSinceLastCall >= delay) {
+      lastResult = fn(...args);
+      lastCall = now;
+    }
+
+    return lastResult;
+  };
+}
+
+export function debounce<T extends (...args: Parameters<T>) => ReturnType<T>>(
+  fn: T,
+  delay: number,
+) {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -10,11 +10,9 @@ class RollingAverage implements IRollingAverage {
   windowSize: number
   outlierCount: number
 
+  public get Data() { return this.data }
 
-  public get Data () { return this.data }
-  
-
-  public get Average () {
+  public get Average() {
     if (this.data.length === 0) return 0
 
     const n = this.data.length
@@ -25,18 +23,18 @@ class RollingAverage implements IRollingAverage {
     return num / denom
   }
 
-  public get StdDev () {
+  public get StdDev() {
     const squaredDifferences = this.data.map(value => Math.pow(value - this.Average, 2))
     const variance = squaredDifferences.reduce((acc, value) => acc + value, 0) / this.data.length
     return Math.sqrt(variance)
   }
 
-  private get OutlierMultiplier () {
+  private get OutlierMultiplier() {
     return Math.exp(this.outlierCount)
   }
 
 
-  constructor (data: number[] = [], windowSize = 5, outlierCount = 0) {
+  constructor(data: number[] = [], windowSize = 5, outlierCount = 0) {
     if (windowSize <= 0) throw new Error('Window size must be greater than 0')
     this.data = data
     this.windowSize = windowSize
@@ -44,14 +42,14 @@ class RollingAverage implements IRollingAverage {
   }
 
 
-  push (value: number) {
+  push(value: number) {
     if (this.isOutlier(value)) {
       this.outlierCount++
       return false
     }
 
     this.data.push(value)
-    
+
     if (this.data.length > this.windowSize)
       this.data.shift()
 
@@ -60,7 +58,7 @@ class RollingAverage implements IRollingAverage {
   }
 
 
-  isOutlier (value: number) {
+  isOutlier(value: number) {
     if (this.data.length < 3) return false
     return Math.abs(value - this.Average) > (this.StdDev * this.OutlierMultiplier)
   }
