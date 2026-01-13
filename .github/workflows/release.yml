@@ -23,6 +23,7 @@ jobs:
         env:
           BASE_PATH: '/${{ github.event.repository.name }}'
           STANDARD_EBOOKS_KEY: ${{ secrets.STANDARD_EBOOKS_KEY }}
+          PUBLIC_OPENAI_API_URL: ${{ secrets.PUBLIC_OPENAI_API_URL }}
         run: bun run build
 
       - name: Upload Artifacts
