@@ -1,3 +1,4 @@
+import { PUBLIC_OPENAI_API_URL } from '$env/static/public';
 import { LLM_MUSIC_PROMPT } from '$lib/constants';
 import type { Prompt } from '$lib/types';
 import { loadSettings } from '$lib/util/storage';
@@ -15,7 +16,7 @@ export default class LLM {
   private model: string;
 
   constructor(llmOptions = {} satisfies ClientOptions, model = 'gpt-5.2') {
-    this.client = new OpenAI({ dangerouslyAllowBrowser: true, ...llmOptions });
+    this.client = new OpenAI({ ...llmOptions, baseURL: PUBLIC_OPENAI_API_URL ? `${PUBLIC_OPENAI_API_URL}/v1` : undefined, dangerouslyAllowBrowser: true });
     this.model = model;
   }
 
