@@ -1,4 +1,3 @@
-import type { Prompt } from '$lib/types';
 import { loadSettings } from '$lib/util/storage';
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
