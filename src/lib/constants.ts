@@ -35,21 +35,19 @@ You will then output a JSON array that contains new prompts, if any.
 You will receive **three inputs**:
     1. The previous passage of text.
     2. JSON of the Lyria prompts that produced the currently playing music - which corresponds to the previous passage of text.
-    3. The current passage of text.
+    3. The next passage of text to analyze.
 
 Use this to decide whether the currently playing music should:
     - **Continue**: no significant shift from the previous passage appears within the current passage. This will likely be the result the majority of the time.
-    - **End and be replaced**: suggest new music along with an anchor in the text where the shift occurs. This *can* happen multiple times within the current passage, but is unlikely.
+    - **End and be replaced**: suggest new music along with an anchor in the text where the shift occurs. This should only happen once within the current passage, and should be nearer the middle of the passage, since it's unlikely that the tone shift coincides with the page break.
 
 *Only one music track plays at a time. You do not need to handle overlaps or fades*
 
 ## Output Format
 
-Return a JSON array with the format \`{ anchor: string; prompts: Prompt[] }[]\` where \`Prompt\` is defined as \`{ text: string; weight: number; }\`
+The output should be formatted as JSON. In the majority of cases in which there is no music change, return \`null\`. If there is a music change return a JSON object with the format \`{ anchor: string; prompts: Prompt[] }\`, where \`Prompt\` is defined as \`{ text: string; weight: number; }\`.
 
 The anchor property contains the text that corresponds to where the music shift should occur.
-
-If no significant shifts happen, assign it to be an empty array (\`[]\`).
 
 # Lyria Realtime
 
@@ -75,7 +73,7 @@ Keep in mind that the music will be playing in the background while reading, so 
 
 ## Example 1 - Most common case where there is no change
 
-### Previous Text
+### Previous Passage
 
 III
 
@@ -110,7 +108,7 @@ He stopped, grunted and glared down at me﻿—his red face growing redder still
   { text: "whimsical", weight: 0.5 },
 ]
 
-### Input Text
+### Next Passage
 
 street, grunting harder than ever.
 
@@ -148,11 +146,11 @@ The dog, Jip, came rushing out and started jumping up on him and barking with ha
 
 ### Output JSON
 
-[]
+null
 
 ## Example 2 - Uncommon case where there is multiple changes
 
-### Previous Text
+### Previous Passage
 
 The Carew Murder Case
 
@@ -167,7 +165,7 @@ Nearly a year later, in the month of October, 18﻿—, London was startled by a
   { text: "gentle and sparse", weight: 0.5 },
 ]
 
-### Input Text
+### Next Passage
 
 A maid servant living alone in a house not far from the river, had gone upstairs to bed about eleven. Although a fog rolled over the city in the small hours, the early part of the night was cloudless, and the lane, which the maid’s window overlooked, was brilliantly lit by the full moon. It seems she was romantically given, for she sat down upon her box, which stood immediately under the window, and fell into a dream of musing. Never (she used to say, with streaming tears, when she narrated that experience), never had she felt more at peace with all men or thought more kindly of the world. And as she so sat she became aware of an aged beautiful gentleman with white hair, drawing near along the lane; and advancing to meet him, another and very small gentleman, to whom at first she paid less attention. When they had come within speech (which was just under the maid’s eyes) the older man bowed and accosted the other with a very pretty manner of politeness. It did not seem as if the subject of his address were of great importance; indeed, from his pointing, it sometimes appeared as if he were only inquiring his way; but the moon shone on his face as he spoke, and the girl was pleased to watch it, it seemed to breathe such an innocent and old-world kindness of disposition, yet with something high too, as of a well-founded self-content. Presently her eye wandered to the other, and she was surprised to recognise in him a certain Mr. Hyde, who had once visited her master and for whom she had conceived a dislike. He had in his hand a heavy cane, with which he was trifling; but he answered never a word, and seemed to listen with an ill-contained impatience. And then all of a sudden he broke out in a great flame of anger, stamping with his foot, brandishing the cane, and carrying on (as the maid described it) like a madman. The old gentleman took a step back, with the air of one very much surprised and a trifle hurt; and at that Mr. Hyde broke out of all bounds and clubbed him to the earth. And next moment, with apelike fury, he was trampling his victim under foot and hailing down a storm of blows, under which the bones were audibly shattered and the body jumped upon the roadway. At the horror of these sights and sounds, the maid fainted.
 
@@ -191,27 +189,18 @@ It was by this time about nine in the morning, and the first fog of the season. 
 
 ### Output JSON
 
-[
-  { anchor: "And then all of a sudden he broke out",  prompts: [
-    { text: "strings", weight: 0.9 },
-    { text: "percussion", weight: 0.7 },
-    { text: "brass", weight: 0.4 },
-    { text: "orchestral score", weight: 0.6 },
-    { text: "orchestral swells", weight: 0.3 },
-    { text: "tense action", weight: 0.4 }
-  ]},
-  { anchor: "This was brought to the lawyer the next morning",  prompts: [
-    { text: "piano", weight: 0.8 },
-    { text: "woodwinds", weight: 0.6 },
-    { text: "soundtrack", weight: 0.8 },
-    { text: "sparse", weight: 0.3 },
-    { text: "uncertain", weight: 0.4 }
-  ]}
-]
+{ anchor: "And then all of a sudden he broke out",  prompts: [
+  { text: "strings", weight: 0.9 },
+  { text: "percussion", weight: 0.7 },
+  { text: "brass", weight: 0.4 },
+  { text: "orchestral score", weight: 0.6 },
+  { text: "orchestral swells", weight: 0.3 },
+  { text: "tense action", weight: 0.4 }
+]}
 
 ## Example 3 - Bootstrap case where the reader has just started reading so there is no music
 
-### Previous Text
+### Previous Passage
 
 
 
@@ -219,7 +208,7 @@ It was by this time about nine in the morning, and the first fog of the season. 
 
 
 
-### Input Text
+### Next Passage
 
 I
 
@@ -265,19 +254,17 @@ To his misfortune, my uncle was not gifted with a sufficiently rapid utterance; 
 
 ### Output JSON
 
-[
-  { anchor: "On the 24th of May",  prompts: [
-    { text: "woodwinds", weight: 0.85 },
-    { text: "soft percussion", weight: 0.4 },
-    { text: "mystery soundtrack", weight: 0.6 },
-    { text: "curious", weight: 0.8 },
-    { text: "light and playful", weight: 0.5 }
-  ]}
-]
+{ anchor: "On the 24th of May",  prompts: [
+  { text: "woodwinds", weight: 0.85 },
+  { text: "soft percussion", weight: 0.4 },
+  { text: "mystery soundtrack", weight: 0.6 },
+  { text: "curious", weight: 0.8 },
+  { text: "light and playful", weight: 0.5 }
+]}
 
 # Final instructions
 
-If you receive blank JSON in the input, you will need to suggest at least one music for the current text.
+If you receive blank JSON in the input, you will need to suggest music for the current text.
 
-When you receive the passage and the JSON output from the previous page, analyze them together and return **only** the JSON output described above. If no changes are needed, return [].
+When you receive the previous passage, current passage, and the prompts for the music that is currently playing, analyze them together and return **only** the JSON output described above. If no changes are needed, return \`null\`.
 `
