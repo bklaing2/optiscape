@@ -21,15 +21,14 @@ export default class LLM {
   }
 
   async requestMusic(previousPassage: string, nextPassage: string, currentMusic: Prompt[]) {
-    const response = await this.client.chat.completions.create({
+    const response = await this.client.responses.create({
       model: this.model,
-      messages: [
-        { role: "developer", content: LLM_MUSIC_PROMPT },
-        { role: "user", content: buildMusicInput(previousPassage, nextPassage, currentMusic) }
-      ],
+      instructions: LLM_MUSIC_PROMPT,
+      input: buildMusicInput(previousPassage, nextPassage, currentMusic),
+      reasoning: { effort: 'none' },
     });
 
-    return JSON.parse(response.choices[0].message.content || "null") as { anchor: string; prompts: Prompt[] } | null;
+    return JSON.parse(response.output_text) as { anchor: string; prompts: Prompt[] } | null;
   }
 }
 
