@@ -78,6 +78,7 @@
     foliateView.addEventListener('load' as any, onLoad)
     foliateView.addEventListener('relocate' as any, onRelocate)
     foliateView.addEventListener('relocate' as any, updateNavButtons)
+    foliateView.renderer.setStyles?.(`html { text-align: justify; }`)
   })
 
   onMount(() => () => foliateView.close())
