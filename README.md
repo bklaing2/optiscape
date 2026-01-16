@@ -8,4 +8,6 @@ When reading a [book](https://bklaing2.github.io/optiscape/books), press the Pla
 - an OpenAI API Key that can use gpt-5.2
 - a Google Gemini API Key for Lyria Realtime
 
+The site utilizes this [proxy](https://github.com/bklaing2/llm-api-proxy) to access OpenAI from the browser.
+
 [Check out the site!](https://bklaing2.github.io/optiscape/)
