@@ -1,12 +1,16 @@
+<script>
+  import { resolve } from '$app/paths'
+</script>
+
 <h1>About Optiscape</h1>
 
 <p class="mt-8">
   Optiscape adds a musical layer to audiobooks. As you read, it analyzes the
   text and plays fitting music.
   <br /><br />
-  When reading a <a href="/books" class="underline">book</a>, press the Play
-  button to generate music. Sometimes it can take a little while to start
-  playing.
+  When reading a <a href={resolve('/books')} class="underline">book</a>, press
+  the Play button to generate music. Sometimes it can take a little while to
+  start playing.
   <br /><br />
 </p>
 <strong
