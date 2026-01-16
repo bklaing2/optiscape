@@ -5,6 +5,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const wait = async (milliseconds: number) => await new Promise((resolve) => setTimeout(resolve, milliseconds))
+
 export function throttle<T extends (...args: Parameters<T>) => ReturnType<T>>(
   fn: T,
   delay: number,

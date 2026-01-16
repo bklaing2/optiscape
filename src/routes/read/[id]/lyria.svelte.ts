@@ -10,8 +10,6 @@ export default class Lyria extends EventTarget {
   private session: LiveMusicSession | null = null;
   private sessionPromise: Promise<LiveMusicSession> | null = null;
 
-  private connectionError = true;
-
   private filteredPrompts = new Set<string>();
   private nextStartTime = 0;
   private bufferTime = 2;
@@ -20,7 +18,8 @@ export default class Lyria extends EventTarget {
   public extraDestination: AudioNode | null = null;
 
   private outputNode: GainNode;
-  private playbackState: PlaybackState = 'stopped';
+  playbackState: PlaybackState = $state('stopped');
+  isPlaying = $derived(this.playbackState === 'playing' || this.playbackState === 'loading');
 
   private weightedPrompts: Prompt[] = [];
 
@@ -42,9 +41,7 @@ export default class Lyria extends EventTarget {
       model: this.model,
       callbacks: {
         onmessage: async (e: LiveMusicServerMessage) => {
-          if (e.setupComplete) {
-            this.connectionError = false;
-          }
+          if (e.setupComplete) { }
           if (e.filteredPrompt) {
             this.filteredPrompts = new Set([...this.filteredPrompts, e.filteredPrompt.text!])
             this.dispatchEvent(new CustomEvent<LiveMusicFilteredPrompt>('filtered-prompt', { detail: e.filteredPrompt }));
@@ -54,12 +51,10 @@ export default class Lyria extends EventTarget {
           }
         },
         onerror: () => {
-          this.connectionError = true;
           this.stop();
           this.dispatchEvent(new CustomEvent('error', { detail: 'Connection error, please restart audio.' }));
         },
         onclose: () => {
-          this.connectionError = true;
           this.stop();
           this.dispatchEvent(new CustomEvent('error', { detail: 'Connection error, please restart audio.' }));
         },
@@ -165,10 +160,6 @@ export default class Lyria extends EventTarget {
       case 'loading':
         return this.stop();
     }
-  }
-
-  public get isPlaying() {
-    return this.playbackState === 'playing' || this.playbackState === 'loading';
   }
 }
 

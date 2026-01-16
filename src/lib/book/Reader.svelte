@@ -27,7 +27,7 @@
     epubUrl: string
     location?: string | undefined
     showPlayButton?: boolean
-    isPlaying?: boolean
+    musicState?: 'stopped' | 'loading' | 'playing'
     onPageTurn?: (args: OnPageTurn) => void
     onPlayPause?: () => void
   }
@@ -36,7 +36,7 @@
     epubUrl,
     location = undefined,
     showPlayButton = false,
-    isPlaying = false,
+    musicState,
     onPageTurn = () => {},
     onPlayPause = () => {}
   }: Props = $props()
@@ -130,6 +130,10 @@
         break
     }
   }
+
+  const buttonSymbol = $derived(
+    musicState === 'stopped' ? '⏵' : musicState === 'loading' ? '·' : '⏸'
+  )
 </script>
 
 <svelte:head>
@@ -146,8 +150,9 @@
       <button
         onclick={onPlayPause}
         class="border border-amber-800/10 bg-orange-200/30 px-2 py-1 select-none hover:bg-orange-300/20"
+        disabled={!musicState || musicState === 'loading'}
       >
-        {isPlaying ? '⏵' : '⏸'}
+        {buttonSymbol}
       </button>
     {/if}
     <ReaderNav onclick={() => nextPage()} side="right" hidden={atEnd} />

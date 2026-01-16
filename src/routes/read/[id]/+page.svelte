@@ -5,7 +5,8 @@
   import { updateBook } from '$lib/db'
   import { DecodeEpubUrl } from '$lib/util/generateLink'
   import Reader, { type OnPageTurn } from '$lib/book/Reader.svelte'
-  import { debounce } from '$lib/utils'
+  import { debounce, wait } from '$lib/utils'
+  import { onDestroy } from 'svelte'
 
   let { data }: PageProps = $props()
   let { llm, lyria } = $derived(data)
@@ -14,6 +15,15 @@
   let characterCount: number
   let startTime = Number.NEGATIVE_INFINITY
   let previousText = ''
+  const musicState = $derived(
+    lyria.playbackState === 'playing'
+      ? 'playing'
+      : lyria.playbackState === 'loading'
+        ? 'loading'
+        : 'stopped'
+  )
+
+  onDestroy(() => lyria.stop())
 
   async function onPageTurn({
     cfi,
@@ -32,7 +42,10 @@
 
   const updateMusic = debounce(async (text: string, startTime: number) => {
     console.info('Requesting music prompts with', lyria.prompts)
+    const prevPlaybackState = lyria.playbackState
+    lyria.playbackState = 'loading'
     const music = await llm.requestMusic(previousText, text, lyria.prompts)
+    lyria.playbackState = prevPlaybackState
 
     console.info('Music prompts:', music)
     if (!music) return
@@ -47,12 +60,14 @@
         60000 - // delay in ms
       (Date.now() - startTime) // account for time taken to get response from LLM
 
-    setTimeout(() => lyria.setWeightedPrompts(music.prompts), delay)
-
     if (delay > 3000)
       console.info(
         `Playing music for '${music.anchor}' in ${delay / 1000} sec (${delay / 60000} min)`
       )
+
+    await wait(delay)
+
+    lyria.setWeightedPrompts(music.prompts)
   }, 1000)
 
   async function updateReadingRate(text: string) {
@@ -72,13 +87,15 @@
     lyria.playPause()
   }
 
-  $effect(() => console.log(lyria.isPlaying))
+  // lyria.addEventListener('playback-state-changed', ({ detail }) =>
+  //   console.log(detail)
+  // )
 </script>
 
 <Reader
   epubUrl={DecodeEpubUrl(page.params.id)}
   showPlayButton
-  isPlaying={lyria.isPlaying}
+  {musicState}
   {onPageTurn}
   {onPlayPause}
 />

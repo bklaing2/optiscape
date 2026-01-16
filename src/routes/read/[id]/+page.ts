@@ -2,7 +2,7 @@ import { loadSettings } from '$lib/util/storage';
 import { error } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
 import LLM from './llm';
-import Lyria from './lyria';
+import Lyria from './lyria.svelte';
 
 export const ssr = false
 export const prerender = false
